@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  /* System Theme - Dark Navy & Cyan */
+  --background: #020617; /* Slate 950 */
+  --foreground: #f8fafc; /* Slate 50 */
+  
+  /* Accents */
+  --primary: #06b6d4; /* Cyan 500 */
+  --secondary: #1e293b; /* Slate 800 */
+  --accent: #22d3ee; /* Cyan 400 */
+  --muted: #64748b; /* Slate 500 */
+  
+  /* UI Elements */
+  --border: #1e293b; /* Slate 800 */
+  --card: #0f172a; /* Slate 900 */
+}
+
+/* Enforce Dark Mode Aesthetics */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #020617;
+    --foreground: #f8fafc;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for the System Look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
