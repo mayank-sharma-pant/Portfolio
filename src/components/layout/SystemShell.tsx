@@ -12,6 +12,7 @@ import StackView from '@/components/modules/StackView';
 import HealioraView from '@/components/modules/HealioraView';
 
 import { synth } from '@/utils/audio-engine';
+import { useRouter } from 'next/navigation';
 
 // Sub-components for cleanliness
 const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
@@ -33,6 +34,14 @@ const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
 
 export default function SystemShell({ children }: { children: React.ReactNode }) {
     const { state, activeModule, mountModule, bootSystem } = useSystem();
+    const router = useRouter();
+
+    const handleSystemReset = () => {
+        synth.playClick();
+        if (activeModule) {
+            mountModule('RESET'); // Internal signal to clear
+        }
+    };
 
     // Trigger boot on mount
     useEffect(() => {
@@ -85,10 +94,10 @@ export default function SystemShell({ children }: { children: React.ReactNode })
 
             {/* Top Status Bar */}
             <header className="h-12 border-b border-border bg-background/80 backdrop-blur-md z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0">
-                <div className="flex items-center gap-6">
+                <button onClick={handleSystemReset} className="flex items-center gap-6 hover:opacity-80 transition-opacity">
                     <span className="text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">SYSTEM_HVY.OS</span>
                     <span className="hidden sm:inline-block opacity-50">KERNEL: 5.0.0-rc1</span>
-                </div>
+                </button>
                 <div className="flex items-center gap-4">
                     <span className="text-green-500 animate-pulse">● ONLINE</span>
                 </div>
@@ -166,10 +175,8 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                                     {renderActiveModule()}
                                 </motion.div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-muted opacity-20 select-none">
-                                    <Terminal className="w-24 h-24 mb-6" />
-                                    <h2 className="text-4xl font-bold tracking-tighter">SYSTEM_IDLE</h2>
-                                    <p className="font-mono mt-2">WAITING FOR INPUT...</p>
+                                <div className="h-full w-full">
+                                    {children}
                                 </div>
                             )}
                         </AnimatePresence>
