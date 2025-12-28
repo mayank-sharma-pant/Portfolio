@@ -15,7 +15,6 @@ import AccessView from '@/components/modules/AccessView';
 
 import { synth } from '@/utils/audio-engine';
 import { useRouter } from 'next/navigation';
-import BackgroundController from '@/components/system/BackgroundController';
 
 // Sub-components for cleanliness
 const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
@@ -76,12 +75,11 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     return (
         <div className="min-h-screen w-full bg-background text-foreground font-mono selection:bg-primary selection:text-background overflow-hidden relative flex flex-col">
 
-            {/* Background & Effects */}
+            {/* Animated Mesh Background - Desaturated & Subtle */}
             <AnimatedBackground />
-            <BackgroundController />
-            <div className="fixed inset-0 z-50 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
-            <div className="fixed inset-0 z-50 pointer-events-none" style={{ background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))', backgroundSize: '100% 2px, 3px 100%' }}></div>
-            <div className="fixed inset-0 z-50 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.9)]"></div>
+
+            {/* Minimal Noise Overlay */}
+            <div className="fixed inset-0 z-50 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
 
             {/* BOOT SCREEN OVERLAY */}
             <AnimatePresence>

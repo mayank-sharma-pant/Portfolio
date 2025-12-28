@@ -1,34 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  /* System Theme - Dark Navy & Cyan */
-  --background: #020617;
-  /* Slate 950 */
-  --foreground: #f8fafc;
-  /* Slate 50 */
+  /* Improved System Theme - Better Readability */
+  --background: #070B14;
+  /* Near-black navy */
+  --foreground: #E8EDF2;
+  /* Primary text - off-white */
 
-  /* Accents */
-  --primary: #06b6d4;
-  /* Cyan 500 */
-  --secondary: #1e293b;
-  /* Slate 800 */
-  --accent: #22d3ee;
-  /* Cyan 400 */
-  --muted: #64748b;
-  /* Slate 500 */
+  /* Text Hierarchy - No Blue Body Text */
+  --text-primary: #E8EDF2;
+  /* Primary text */
+  --text-secondary: #A8B4C4;
+  /* Secondary labels */
+  --text-muted: #7C8A9E;
+  /* Muted metadata */
 
-  /* UI Elements */
-  --border: #1e293b;
-  /* Slate 800 */
-  --card: #0f172a;
-  /* Slate 900 */
+  /* Accent - Cyan for Active States Only */
+  --primary: #3FB9E0;
+  /* Muted cyan - accents only */
+  --secondary: #121826;
+  /* Neutral dark gray-blue */
+  --accent: #3FB9E0;
+  /* Same as primary */
+  --muted: #7C8A9E;
+  /* Muted text */
+
+  /* UI Elements - Neutral, Not Blue */
+  --border: rgba(120, 160, 200, 0.18);
+  /* Thin calm borders */
+  --card: rgba(18, 24, 38, 0.78);
+  /* Neutral dark panels */
 }
 
-/* Enforce Dark Mode Aesthetics */
+/* Enforce Dark Mode */
 @media (prefers-color-scheme: light) {
   :root {
-    --background: #020617;
-    --foreground: #f8fafc;
+    --background: #070B14;
+    --foreground: #E8EDF2;
   }
 }
 
@@ -47,14 +55,19 @@
 }
 
 body {
-  background: var(--background);
+  background: #070B14;
+  /* Near-black navy base */
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
   position: relative;
+  font-size: 15px;
+  /* +1px for readability */
+  line-height: 1.55;
+  /* Better breathing room */
 }
 
-/* Ambient Background Effects Layer */
+/* Readability Shield - Dims mesh behind content */
 body::before {
   content: '';
   position: fixed;
@@ -63,53 +76,18 @@ body::before {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 0;
-
-  /* Subtle scanline/noise overlay - enhanced layering */
-  background-image:
-    /* Fine scanlines */
-    repeating-linear-gradient(0deg,
-      rgba(6, 182, 212, 0.015) 0px,
-      transparent 1px,
-      transparent 2px,
-      rgba(6, 182, 212, 0.015) 3px),
-    /* Coarse scanlines for depth */
-    repeating-linear-gradient(0deg,
-      rgba(6, 182, 212, 0.008) 0px,
-      transparent 2px,
-      transparent 6px,
-      rgba(6, 182, 212, 0.008) 8px),
-    /* Faint grid lines */
-    repeating-linear-gradient(90deg,
-      rgba(30, 41, 59, 0.025) 0px,
-      transparent 1px,
-      transparent 100px),
-    repeating-linear-gradient(0deg,
-      rgba(30, 41, 59, 0.025) 0px,
-      transparent 1px,
-      transparent 100px);
-
-  /* Reactive background gradient - controlled by JS */
-  background-color: var(--bg-gradient-color, #020617);
-  transition: background-color 300ms ease-out;
+  z-index: 1;
+  background: linear-gradient(rgba(7, 11, 20, 0.85),
+      rgba(7, 11, 20, 0.85));
 }
 
-/* Ensure content appears above background effects */
+/* Ensure content appears above shield */
 body>* {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-/* Reactive gradient states - applied via JS */
-body[data-gradient-state="active"]::before {
-  background-color: #0a0f1e;
-}
-
-body[data-gradient-state="loading"] ::before {
-  background-color: #050a14;
-}
-
-/* Data pulse effect - triggered on log updates */
+/* Data pulse effect - minimal */
 @keyframes dataPulse {
   0% {
     opacity: 0;
@@ -117,7 +95,7 @@ body[data-gradient-state="loading"] ::before {
   }
 
   50% {
-    opacity: 0.3;
+    opacity: 0.2;
   }
 
   100% {
@@ -131,14 +109,14 @@ body[data-gradient-state="loading"] ::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(63, 185, 224, 0.3), transparent);
   pointer-events: none;
   z-index: 100;
-  animation: dataPulse 500ms ease-out;
+  animation: dataPulse 400ms ease-out;
 }
 
-/* Panel glow effect for active/focused elements */
+/* Panel glow - very subtle, cyan accent */
 .panel-glow {
   position: relative;
 }
@@ -146,13 +124,13 @@ body[data-gradient-state="loading"] ::before {
 .panel-glow::after {
   content: '';
   position: absolute;
-  inset: -20px;
+  inset: -10px;
   background: radial-gradient(circle at center,
-      rgba(6, 182, 212, 0.08) 0%,
+      rgba(63, 185, 224, 0.04) 0%,
       transparent 70%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 300ms ease-out;
+  transition: opacity 200ms ease-out;
   z-index: -1;
 }
 
@@ -162,7 +140,7 @@ body[data-gradient-state="loading"] ::before {
   opacity: 1;
 }
 
-/* Custom Scrollbar for the System Look */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -172,111 +150,10 @@ body[data-gradient-state="loading"] ::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary);
+  background: rgba(120, 160, 200, 0.25);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-}
-
-/* Stunning Background Animations */
-@keyframes gradient-wave-1 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-  }
-
-  33% {
-    transform: translate(10%, -10%) rotate(5deg) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-10%, 10%) rotate(-5deg) scale(0.9);
-  }
-}
-
-@keyframes gradient-wave-2 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-  }
-
-  33% {
-    transform: translate(-15%, 10%) rotate(-7deg) scale(1.15);
-  }
-
-  66% {
-    transform: translate(15%, -10%) rotate(7deg) scale(0.85);
-  }
-}
-
-@keyframes float-slow {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  50% {
-    transform: translate(30px, -30px);
-  }
-}
-
-@keyframes float-slower {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  50% {
-    transform: translate(-40px, 40px);
-  }
-}
-
-@keyframes float-medium {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  50% {
-    transform: translate(20px, 30px);
-  }
-}
-
-@keyframes pulse-grid {
-
-  0%,
-  100% {
-    opacity: 0.05;
-  }
-
-  50% {
-    opacity: 0.15;
-  }
-}
-
-.animate-gradient-wave-1 {
-  animation: gradient-wave-1 20s ease-in-out infinite;
-}
-
-.animate-gradient-wave-2 {
-  animation: gradient-wave-2 25s ease-in-out infinite;
-}
-
-.animate-float-slow {
-  animation: float-slow 30s ease-in-out infinite;
-}
-
-.animate-float-slower {
-  animation: float-slower 40s ease-in-out infinite;
-}
-
-.animate-float-medium {
-  animation: float-medium 35s ease-in-out infinite;
+  background: rgba(120, 160, 200, 0.35);
 }

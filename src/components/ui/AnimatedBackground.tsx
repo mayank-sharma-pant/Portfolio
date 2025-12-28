@@ -32,15 +32,15 @@ export default function AnimatedBackground() {
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // Initialize particles
-        const particleCount = 80;
+        // Initialize particles - increased count for more visual impact
+        const particleCount = 120;
         particlesRef.current = Array.from({ length: particleCount }, (_) => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: (Math.random() - 0.5) * 0.5,
-            size: Math.random() * 2 + 1,
-            opacity: Math.random() * 0.5 + 0.3,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            size: Math.random() * 3 + 1,
+            opacity: Math.random() * 0.6 + 0.4,
         }));
 
         // Mouse tracking
@@ -51,7 +51,8 @@ export default function AnimatedBackground() {
 
         // Animation loop
         const animate = () => {
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.05)';
+            // Darker fade for near-black base
+            ctx.fillStyle = 'rgba(7, 11, 20, 0.15)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const particles = particlesRef.current;
@@ -66,34 +67,50 @@ export default function AnimatedBackground() {
                 if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
                 if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
 
-                // Mouse interaction
+                // Mouse interaction - stronger effect
                 const dx = mouseRef.current.x - particle.x;
                 const dy = mouseRef.current.y - particle.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 150) {
-                    particle.x -= dx * 0.01;
-                    particle.y -= dy * 0.01;
+                if (distance < 200) {
+                    const force = (200 - distance) / 200;
+                    particle.x -= dx * 0.02 * force;
+                    particle.y -= dy * 0.02 * force;
                 }
 
-                // Draw particle with glow
-                ctx.shadowBlur = 15;
+                // Draw particle with enhanced glow
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = '#06b6d4';
                 ctx.fillStyle = `rgba(6, 182, 212, ${particle.opacity})`;
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Add extra glow layer
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = `rgba(34, 211, 238, ${particle.opacity * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size * 1.5, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Draw connections
+                // Draw connections with gradient
                 particles.slice(i + 1).forEach((otherParticle) => {
                     const dx = particle.x - otherParticle.x;
                     const dy = particle.y - otherParticle.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
-                    if (distance < 120) {
-                        const opacity = (1 - distance / 120) * 0.3;
-                        ctx.strokeStyle = `rgba(6, 182, 212, ${opacity})`;
-                        ctx.lineWidth = 0.5;
+                    if (distance < 150) {
+                        const opacity = (1 - distance / 150) * 0.4;
+                        const gradient = ctx.createLinearGradient(
+                            particle.x, particle.y,
+                            otherParticle.x, otherParticle.y
+                        );
+                        gradient.addColorStop(0, `rgba(6, 182, 212, ${opacity})`);
+                        gradient.addColorStop(0.5, `rgba(34, 211, 238, ${opacity * 0.8})`);
+                        gradient.addColorStop(1, `rgba(6, 182, 212, ${opacity})`);
+
+                        ctx.strokeStyle = gradient;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particle.x, particle.y);
                         ctx.lineTo(otherParticle.x, otherParticle.y);
@@ -118,43 +135,27 @@ export default function AnimatedBackground() {
 
     return (
         <>
-            {/* Particle Canvas */}
+            {/* Particle Canvas - Felt, Not Visible */}
             <canvas
                 ref={canvasRef}
                 className="fixed inset-0 z-0 pointer-events-none"
-                style={{ opacity: 0.6 }}
+                style={{ opacity: 0.4 }}
             />
 
-            {/* Animated Gradient Waves */}
+            {/* Desaturated Gradient Waves */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute inset-0 animate-gradient-wave-1 opacity-20">
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-transparent to-blue-500/20" />
+                <div className="absolute inset-0 animate-gradient-wave-1 opacity-10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-700/10 via-transparent to-slate-600/10" />
                 </div>
-                <div className="absolute inset-0 animate-gradient-wave-2 opacity-15">
-                    <div className="absolute inset-0 bg-gradient-to-tl from-blue-500/20 via-transparent to-cyan-500/20" />
+                <div className="absolute inset-0 animate-gradient-wave-2 opacity-8">
+                    <div className="absolute inset-0 bg-gradient-to-tl from-slate-600/10 via-transparent to-slate-700/10" />
                 </div>
             </div>
 
-            {/* Glowing Orbs */}
+            {/* Subtle Glowing Orbs */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-float-slow" />
-                <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-float-slower" />
-                <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl animate-float-medium" />
-            </div>
-
-            {/* Pulsing Grid */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                        backgroundImage: `
-                            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)
-                        `,
-                        backgroundSize: '50px 50px',
-                        animation: 'pulse-grid 4s ease-in-out infinite'
-                    }}
-                />
+                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-slate-600/5 rounded-full blur-3xl animate-float-slow" />
+                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-slate-700/5 rounded-full blur-3xl animate-float-slower" />
             </div>
         </>
     );
