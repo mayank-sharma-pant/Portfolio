@@ -9,39 +9,39 @@ export interface LogEntry {
 
 export const experience: LogEntry[] = [
     {
-        id: "LOG_2024_01",
-        role: "Sensior Backend Engineer",
-        company: "TECH_CORP_GLOBAL",
-        period: "2022 - PRESENT",
-        type: "FULL_TIME",
+        id: "LOG_2024_HEALIORA",
+        role: "Co-founder & Product-Focused Engineer",
+        company: "Healiora (CU-TBI Incubated)",
+        period: "2024 - PRESENT",
+        type: "STARTUP",
         details: [
-            "Orchestrated migration of legacy monolith to microservices architecture.",
-            "Optimized database query performance reducing latency by 40%.",
-            "Lead a squad of 4 engineers in developing high-throughput API gateways."
+            "Planned and executed MVP scope",
+            "Designed backend APIs using FastAPI",
+            "Worked on patient app and hospital dashboard flows",
+            "Coordinated product decisions with mentors"
         ]
     },
     {
-        id: "LOG_2021_04",
-        role: "Software Developer II",
-        company: "INNOVATE_SYSTEMS",
-        period: "2020 - 2022",
-        type: "CONTRACT",
+        id: "LOG_2024_SUNEDGE",
+        role: "Backend Developer Intern",
+        company: "SunEdge IT Solutions",
+        period: "2024 - PRESENT",
+        type: "INTERNSHIP",
         details: [
-            "Implemented real-time data processing pipelines using Kafka.",
-            "Developed internal developer tooling for automated deployments.",
-            "Maintained 99.9% uptime for core authentication services."
+            "Built and maintained backend services",
+            "Worked on REST APIs and clean architecture",
+            "Collaborated with frontend and QA teams",
+            "Followed version control and deployment workflows"
         ]
     },
     {
-        id: "LOG_2019_08",
-        role: "Junior Systems Engineer",
-        company: "STARTUP_V1",
-        period: "2018 - 2020",
-        type: "FULL_TIME",
+        id: "LOG_2022_CU",
+        role: "B.Tech Computer Science & Engineering",
+        company: "Chandigarh University",
+        period: "2022 - 2026",
+        type: "EDUCATION",
         details: [
-            "Built initial MVP for customer-facing dashboard.",
-            "Integrated third-party payment gateways (Stripe, PayPal).",
-            "Assisted in infrastructure setup using AWS CloudFormation."
+            "Ongoing program in Computer Science & Engineering"
         ]
     }
 ];

@@ -17,6 +17,7 @@ interface SystemContextType {
     activeModule: string | null;
     logs: LogEntry[];
     pushLog: (message: string, type?: LogType) => void;
+    clearLogs: () => void;
     mountModule: (moduleId: string) => void;
     bootSystem: () => void;
 }
@@ -54,6 +55,10 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
         }]);
     }, []);
 
+    const clearLogs = useCallback(() => {
+        setLogs([]);
+    }, []);
+
     const bootSystem = useCallback(() => {
         // Cinematic Boot Sequence
         let step = 0;
@@ -79,6 +84,16 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
     }, [pushLog]);
 
     const mountModule = useCallback((moduleId: string) => {
+        // Handle RESET (go back to home)
+        if (moduleId === 'RESET') {
+            if (!activeModule) return; // Already at home
+            synth.playNavigate();
+            setActiveModule(null);
+            setState('IDLE');
+            pushLog('Returning to SYSTEM_OVERVIEW', 'SYSTEM');
+            return;
+        }
+
         if (activeModule === moduleId) return;
 
         // Audio Feedback
@@ -133,7 +148,7 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
     }, [state, pushLog]);
 
     return (
-        <SystemContext.Provider value={{ state, activeModule, logs, pushLog, mountModule, bootSystem }}>
+        <SystemContext.Provider value={{ state, activeModule, logs, pushLog, clearLogs, mountModule, bootSystem }}>
             {children}
         </SystemContext.Provider>
     );

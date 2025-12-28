@@ -5,11 +5,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Starfield from '@/components/ui/Starfield';
 import LogStream from '@/components/system/LogStream';
 import { useSystem } from '@/context/SystemContext';
-import { Database, Terminal, Cpu, Activity, Lock } from 'lucide-react';
+import { Database, Terminal, Cpu, Activity, Lock, Home, Terminal as Terminal2, Mail } from 'lucide-react';
 import ProjectsView from '@/components/modules/ProjectsView';
 import ExperienceView from '@/components/modules/ExperienceView';
 import StackView from '@/components/modules/StackView';
 import HealioraView from '@/components/modules/HealioraView';
+import SystemCommandsView from '@/components/modules/SystemCommandsView';
+import AccessView from '@/components/modules/AccessView';
 
 import { synth } from '@/utils/audio-engine';
 import { useRouter } from 'next/navigation';
@@ -59,6 +61,10 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                 return <StackView />;
             case 'HEALIORA':
                 return <HealioraView />;
+            case 'SYSTEM_COMMANDS':
+                return <SystemCommandsView />;
+            case 'ACCESS':
+                return <AccessView />;
             default:
                 // By default, if no specific module is active but state is active (edge case), 
                 // we could show children or empty state.
@@ -109,6 +115,18 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                 {/* Left Sidebar (Module Selector) */}
                 <aside className="w-64 border-r border-border bg-black/20 backdrop-blur-sm hidden md:flex flex-col">
                     <div className="p-4 text-xs font-mono text-muted uppercase tracking-widest opacity-50 mb-2">Modules</div>
+
+                    {/* HOME Button */}
+                    <ModuleButton
+                        id="HOME"
+                        label="SYSTEM_OVERVIEW"
+                        icon={Home}
+                        active={!activeModule}
+                        onClick={handleSystemReset}
+                    />
+
+                    <div className="h-px bg-border my-2 mx-4"></div>
+
                     <ModuleButton
                         id="PROJECTS"
                         label="PROJECTS"
@@ -129,6 +147,20 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         icon={Cpu}
                         active={activeModule === 'STACK'}
                         onClick={() => mountModule('STACK')}
+                    />
+                    <ModuleButton
+                        id="SYSTEM_COMMANDS"
+                        label="SYSTEM_COMMANDS"
+                        icon={Terminal2}
+                        active={activeModule === 'SYSTEM_COMMANDS'}
+                        onClick={() => mountModule('SYSTEM_COMMANDS')}
+                    />
+                    <ModuleButton
+                        id="ACCESS"
+                        label="ACCESS"
+                        icon={Mail}
+                        active={activeModule === 'ACCESS'}
+                        onClick={() => mountModule('ACCESS')}
                     />
                     <div className="mt-auto p-4 border-t border-border">
                         <ModuleButton

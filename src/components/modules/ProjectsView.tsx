@@ -1,11 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { projects } from '@/data/projects';
-import { ExternalLink } from 'lucide-react';
+import { useSystem } from '@/context/SystemContext';
+import { synth } from '@/utils/audio-engine';
 
 export default function ProjectsView() {
+    const { pushLog } = useSystem();
+    const [hoveredProject, setHoveredProject] = useState<string | null>(null);
+
+    const handleProjectHover = (projectId: string, projectName: string) => {
+        if (hoveredProject !== projectId) {
+            synth.playHover();
+            pushLog(`Inspecting PROJECT: ${projectName}`, 'SYSTEM');
+            setHoveredProject(projectId);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Module Header */}
@@ -29,7 +41,6 @@ export default function ProjectsView() {
                     <div className="hidden sm:block sm:col-span-4">DESCRIPTION</div>
                     <div className="hidden sm:block sm:col-span-2">STACK</div>
                     <div className="col-span-3 sm:col-span-1 text-right">STATUS</div>
-                    {/* <div className="hidden sm:block sm:col-span-1 text-right">LINK</div> */}
                 </div>
 
                 {/* Data Rows */}
@@ -40,6 +51,8 @@ export default function ProjectsView() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
+                            onMouseEnter={() => handleProjectHover(project.id, project.name)}
+                            onMouseLeave={() => setHoveredProject(null)}
                             className="grid grid-cols-12 gap-4 p-3 sm:p-4 items-center hover:bg-white/5 transition-colors group font-mono text-xs cursor-pointer"
                         >
                             <div className="col-span-2 text-muted/50 group-hover:text-primary transition-colors">
@@ -64,18 +77,11 @@ export default function ProjectsView() {
                   px-1.5 py-0.5 text-[10px] border tracking-wider
                   ${project.status === 'LIVE' ? 'border-green-500/30 text-green-400 bg-green-500/5' :
                                         project.status === 'BETA' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5' :
-                                            'border-gray-500/30 text-gray-500 bg-gray-500/5'}
+                                            'border-gray-500/30 text-gray-500 bg-gray-500/5'}\
                 `}>
                                     {project.status}
                                 </span>
                             </div>
-
-                            {/* External Link Overlay on Hover? Or just clickable row */}
-                            {/* <div className="hidden sm:block sm:col-span-1 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                <a href={project.link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-3 h-3 text-primary ml-auto" />
-                </a>
-              </div> */}
                         </motion.div>
                     ))}
                 </div>

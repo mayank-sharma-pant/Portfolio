@@ -66,6 +66,50 @@ class AudioSynth {
         osc.stop(this.ctx!.currentTime + 0.1);
     }
 
+    // Softer click for card interactions
+    public playCardClick() {
+        if (!this.initCheck() || this.isMuted) return;
+
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, this.ctx!.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, this.ctx!.currentTime + 0.08);
+
+        // Quieter than regular click
+        gain.gain.setValueAtTime(0.04, this.ctx!.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx!.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start();
+        osc.stop(this.ctx!.currentTime + 0.08);
+    }
+
+    // More prominent sound for module/page navigation
+    public playNavigate() {
+        if (!this.initCheck() || this.isMuted) return;
+
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(250, this.ctx!.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(500, this.ctx!.currentTime + 0.15);
+
+        // Louder and longer than card click
+        gain.gain.setValueAtTime(0.12, this.ctx!.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx!.currentTime + 0.15);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start();
+        osc.stop(this.ctx!.currentTime + 0.15);
+    }
+
     public playMount() {
         if (!this.initCheck() || this.isMuted) return;
 

@@ -43,6 +43,61 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient Background Effects Layer */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  
+  /* Subtle scanline/noise overlay */
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(6, 182, 212, 0.02) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(6, 182, 212, 0.02) 3px
+    ),
+    /* Faint grid lines */
+    repeating-linear-gradient(
+      90deg,
+      rgba(30, 41, 59, 0.03) 0px,
+      transparent 1px,
+      transparent 100px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(30, 41, 59, 0.03) 0px,
+      transparent 1px,
+      transparent 100px
+    );
+  
+  /* Slow-moving background gradient */
+  background-color: var(--background);
+  animation: ambientGradient 45s ease-in-out infinite;
+}
+
+/* Ensure content appears above background effects */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes ambientGradient {
+  0%, 100% {
+    background-color: #020617;
+  }
+  50% {
+    background-color: #0a0f1e;
+  }
 }
 
 /* Custom Scrollbar for the System Look */
@@ -59,3 +114,4 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
 }
+
