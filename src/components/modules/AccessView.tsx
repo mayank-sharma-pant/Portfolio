@@ -35,14 +35,31 @@ export default function AccessView() {
         pushLog('Sending message...', 'SYSTEM');
         synth.playClick();
 
-        // Simulate sending (replace with actual EmailJS or API call)
-        setTimeout(() => {
-            pushLog('✓ Message sent successfully', 'SUCCESS');
-            pushLog('Response time: ~24 hours', 'INFO');
-            synth.playMount();
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                pushLog('✓ Message sent successfully', 'SUCCESS');
+                pushLog('Response time: ~24 hours', 'INFO');
+                synth.playMount();
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                const error = await response.json();
+                pushLog(`Error: ${error.error || 'Failed to send message'}`, 'ERROR');
+                synth.playError();
+            }
+        } catch (error) {
+            pushLog('Error: Network error. Please try again.', 'ERROR');
+            synth.playError();
+        } finally {
             setIsSubmitting(false);
-            setFormData({ name: '', email: '', message: '' });
-        }, 1500);
+        }
     };
 
     const handleDownloadResume = () => {

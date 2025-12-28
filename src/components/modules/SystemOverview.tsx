@@ -58,7 +58,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_ID')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'SYSTEM_ID'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -96,7 +96,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('CAPABILITIES')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'CAPABILITIES'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -136,7 +136,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('CURRENT_ROLE')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'CURRENT_ROLE'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -168,7 +168,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('EXECUTION_CONTEXT')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'EXECUTION_CONTEXT'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -204,7 +204,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_FOCUS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'SYSTEM_FOCUS'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -240,7 +240,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_SIGNALS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'SYSTEM_SIGNALS'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -276,7 +276,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('EXTERNAL_INTERFACES')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'EXTERNAL_INTERFACES'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'
@@ -334,7 +334,7 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_STATUS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair
+                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
                             ${hoveredCard === 'SYSTEM_STATUS'
                                 ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                                 : 'bg-black/40 border-primary/20'

@@ -34,7 +34,7 @@ export default function ExperienceView() {
                         </div>
 
                         {/* Content Card - More Minimal/Terminal Style */}
-                        <div className="bg-black/20 border border-border/50 p-5 group-hover:border-primary/30 transition-all relative overflow-hidden">
+                        <div className="bg-black/20 border border-border/50 p-5 group-hover:border-primary/30 transition-all relative overflow-hidden panel-glow">
                             {/* Decorative Header */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/20 pb-3 mb-3 gap-2">
                                 <div className="flex items-center gap-3">

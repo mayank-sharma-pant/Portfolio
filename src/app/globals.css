@@ -2,18 +2,26 @@
 
 :root {
   /* System Theme - Dark Navy & Cyan */
-  --background: #020617; /* Slate 950 */
-  --foreground: #f8fafc; /* Slate 50 */
-  
+  --background: #020617;
+  /* Slate 950 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
+
   /* Accents */
-  --primary: #06b6d4; /* Cyan 500 */
-  --secondary: #1e293b; /* Slate 800 */
-  --accent: #22d3ee; /* Cyan 400 */
-  --muted: #64748b; /* Slate 500 */
-  
+  --primary: #06b6d4;
+  /* Cyan 500 */
+  --secondary: #1e293b;
+  /* Slate 800 */
+  --accent: #22d3ee;
+  /* Cyan 400 */
+  --muted: #64748b;
+  /* Slate 500 */
+
   /* UI Elements */
-  --border: #1e293b; /* Slate 800 */
-  --card: #0f172a; /* Slate 900 */
+  --border: #1e293b;
+  /* Slate 800 */
+  --card: #0f172a;
+  /* Slate 900 */
 }
 
 /* Enforce Dark Mode Aesthetics */
@@ -56,62 +64,219 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  
-  /* Subtle scanline/noise overlay */
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      rgba(6, 182, 212, 0.02) 0px,
+
+  /* Subtle scanline/noise overlay - enhanced layering */
+  background-image:
+    /* Fine scanlines */
+    repeating-linear-gradient(0deg,
+      rgba(6, 182, 212, 0.015) 0px,
       transparent 1px,
       transparent 2px,
-      rgba(6, 182, 212, 0.02) 3px
-    ),
+      rgba(6, 182, 212, 0.015) 3px),
+    /* Coarse scanlines for depth */
+    repeating-linear-gradient(0deg,
+      rgba(6, 182, 212, 0.008) 0px,
+      transparent 2px,
+      transparent 6px,
+      rgba(6, 182, 212, 0.008) 8px),
     /* Faint grid lines */
-    repeating-linear-gradient(
-      90deg,
-      rgba(30, 41, 59, 0.03) 0px,
+    repeating-linear-gradient(90deg,
+      rgba(30, 41, 59, 0.025) 0px,
       transparent 1px,
-      transparent 100px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(30, 41, 59, 0.03) 0px,
+      transparent 100px),
+    repeating-linear-gradient(0deg,
+      rgba(30, 41, 59, 0.025) 0px,
       transparent 1px,
-      transparent 100px
-    );
-  
-  /* Slow-moving background gradient */
-  background-color: var(--background);
-  animation: ambientGradient 45s ease-in-out infinite;
+      transparent 100px);
+
+  /* Reactive background gradient - controlled by JS */
+  background-color: var(--bg-gradient-color, #020617);
+  transition: background-color 300ms ease-out;
 }
 
 /* Ensure content appears above background effects */
-body > * {
+body>* {
   position: relative;
   z-index: 1;
 }
 
-@keyframes ambientGradient {
-  0%, 100% {
-    background-color: #020617;
+/* Reactive gradient states - applied via JS */
+body[data-gradient-state="active"]::before {
+  background-color: #0a0f1e;
+}
+
+body[data-gradient-state="loading"] ::before {
+  background-color: #050a14;
+}
+
+/* Data pulse effect - triggered on log updates */
+@keyframes dataPulse {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.5);
   }
+
   50% {
-    background-color: #0a0f1e;
+    opacity: 0.3;
   }
+
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+.data-pulse {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+  pointer-events: none;
+  z-index: 100;
+  animation: dataPulse 500ms ease-out;
+}
+
+/* Panel glow effect for active/focused elements */
+.panel-glow {
+  position: relative;
+}
+
+.panel-glow::after {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle at center,
+      rgba(6, 182, 212, 0.08) 0%,
+      transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  z-index: -1;
+}
+
+.panel-glow:hover::after,
+.panel-glow:focus-within::after,
+.panel-glow[data-active="true"]::after {
+  opacity: 1;
 }
 
 /* Custom Scrollbar for the System Look */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--background);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--secondary);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
 }
 
+/* Stunning Background Animations */
+@keyframes gradient-wave-1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  33% {
+    transform: translate(10%, -10%) rotate(5deg) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-10%, 10%) rotate(-5deg) scale(0.9);
+  }
+}
+
+@keyframes gradient-wave-2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  33% {
+    transform: translate(-15%, 10%) rotate(-7deg) scale(1.15);
+  }
+
+  66% {
+    transform: translate(15%, -10%) rotate(7deg) scale(0.85);
+  }
+}
+
+@keyframes float-slow {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(30px, -30px);
+  }
+}
+
+@keyframes float-slower {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-40px, 40px);
+  }
+}
+
+@keyframes float-medium {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(20px, 30px);
+  }
+}
+
+@keyframes pulse-grid {
+
+  0%,
+  100% {
+    opacity: 0.05;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.animate-gradient-wave-1 {
+  animation: gradient-wave-1 20s ease-in-out infinite;
+}
+
+.animate-gradient-wave-2 {
+  animation: gradient-wave-2 25s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 30s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 40s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 35s ease-in-out infinite;
+}

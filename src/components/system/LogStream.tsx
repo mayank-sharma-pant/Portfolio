@@ -14,11 +14,32 @@ export default function LogStream() {
     const [input, setInput] = useState('');
     const [commandHistory, setCommandHistory] = useState<string[]>([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const [hasUserScrolled, setHasUserScrolled] = useState(false);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom
+    // Detect if user has scrolled away from bottom
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const threshold = 10; // Reduced for better detection
+        const isBottom = target.scrollHeight - target.scrollTop - target.clientHeight < threshold;
+        setIsAtBottom(isBottom);
+
+        // Mark that user has manually scrolled if they scroll up
+        if (!isBottom) {
+            setHasUserScrolled(true);
+        } else {
+            // Reset when user scrolls back to bottom
+            setHasUserScrolled(false);
+        }
+    };
+
+    // Conditional auto-scroll - only when user is at bottom or hasn't scrolled yet
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [logs]);
+        if (isAtBottom || !hasUserScrolled) {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [logs, isAtBottom, hasUserScrolled]);
 
     const handleCommand = (command: string) => {
         if (!command.trim()) return;
@@ -97,7 +118,7 @@ export default function LogStream() {
     return (
         <div className="h-48 w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col">
             {/* Log Output */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-1">
                     <AnimatePresence initial={false}>
                         {logs.map((log) => (
@@ -106,10 +127,10 @@ export default function LogStream() {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 className={`flex gap-3 ${log.type === 'ERROR' ? 'text-red-500' :
-                                        log.type === 'WARNING' ? 'text-yellow-500' :
-                                            log.type === 'SUCCESS' ? 'text-green-500' :
-                                                log.type === 'SYSTEM' ? 'text-primary' :
-                                                    'text-muted'
+                                    log.type === 'WARNING' ? 'text-yellow-500' :
+                                        log.type === 'SUCCESS' ? 'text-green-500' :
+                                            log.type === 'SYSTEM' ? 'text-primary' :
+                                                'text-muted'
                                     }`}
                             >
                                 <span className="opacity-50">[{log.timestamp}]</span>

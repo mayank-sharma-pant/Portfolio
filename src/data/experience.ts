@@ -12,7 +12,7 @@ export const experience: LogEntry[] = [
         id: "LOG_2024_HEALIORA",
         role: "Co-founder & Product-Focused Engineer",
         company: "Healiora (CU-TBI Incubated)",
-        period: "2024 - PRESENT",
+        period: "Mar 2024 – Present",
         type: "STARTUP",
         details: [
             "Planned and executed MVP scope",
@@ -25,7 +25,7 @@ export const experience: LogEntry[] = [
         id: "LOG_2024_SUNEDGE",
         role: "Backend Developer Intern",
         company: "SunEdge IT Solutions",
-        period: "2024 - PRESENT",
+        period: "Dec 2024 – Present",
         type: "INTERNSHIP",
         details: [
             "Built and maintained backend services",
