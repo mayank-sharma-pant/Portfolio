@@ -9,9 +9,15 @@ export default function SystemOverview() {
     const { pushLog } = useSystem();
     const [mounted, setMounted] = useState(false);
     const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+    const [lightSweepComplete, setLightSweepComplete] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        // Light sweep animation (wow moment)
+        const timer = setTimeout(() => {
+            setLightSweepComplete(true);
+        }, 2000);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleCardHover = (cardName: string) => {
@@ -26,23 +32,40 @@ export default function SystemOverview() {
         setHoveredCard(null);
     };
 
-    // Stagger delays for sections
+    // Weighted stagger delays for sections
     const sectionVariants = {
-        hidden: { opacity: 0, y: 10 },
+        hidden: { opacity: 0, y: 15, scale: 0.98 },
         visible: (delay: number) => ({
             opacity: 1,
             y: 0,
-            transition: { duration: 0.5, delay }
+            scale: 1,
+            transition: {
+                duration: 0.6,
+                delay: delay + 0.02,
+                ease: [0.4, 0, 0.2, 1]
+            }
         })
     };
 
     return (
-        <div className="h-full w-full flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
-            <div className="max-w-5xl w-full space-y-6 font-mono text-sm">
+        <div className="h-full w-full flex items-center justify-center p-6 sm:p-12 overflow-y-auto relative">
+            {/* Light Sweep - Wow Moment */}
+            {!lightSweepComplete && (
+                <motion.div
+                    className="absolute inset-0 pointer-events-none z-50"
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '100%' }}
+                    transition={{ duration: 2, ease: 'linear' }}
+                >
+                    <div className="h-full w-[200px] bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-xl" />
+                </motion.div>
+            )}
+
+            <div className="max-w-5xl w-full space-y-8 font-mono text-sm">
 
                 {/* Page Title */}
-                <div className="border-b border-primary/20 pb-4 mb-8">
-                    <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <div className="border-b border-primary/20 pb-6 mb-8">
+                    <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
                         <span className="text-primary">{'>'}</span> SYSTEM_OVERVIEW
                     </h1>
                 </div>
@@ -58,18 +81,22 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_ID')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm
+                            transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'SYSTEM_ID'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_ID' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'SYSTEM_ID' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold font-bold">
                             SYSTEM_ID
                         </h2>
-                        <div className="space-y-2 text-xs">
+                        <div className="space-y-2.5 text-xs">
                             <div className="flex gap-4">
                                 <span className="text-muted w-20">NAME:</span>
                                 <span className="text-foreground font-bold">Mayank Sharma</span>
@@ -96,15 +123,18 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('CAPABILITIES')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'CAPABILITIES'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'CAPABILITIES' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'CAPABILITIES' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             CAPABILITIES
                         </h2>
                         <ul className="space-y-1.5 text-xs text-foreground/80">
@@ -136,15 +166,18 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('CURRENT_ROLE')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'CURRENT_ROLE'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'CURRENT_ROLE' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'CURRENT_ROLE' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             CURRENT_ROLE
                         </h2>
                         <ul className="space-y-1.5 text-xs text-foreground/80">
@@ -168,15 +201,19 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('EXECUTION_CONTEXT')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm
+                            transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'EXECUTION_CONTEXT'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'EXECUTION_CONTEXT' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'EXECUTION_CONTEXT' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             EXECUTION_CONTEXT
                         </h2>
                         <ul className="space-y-1.5 text-xs text-foreground/80">
@@ -204,15 +241,18 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_FOCUS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'SYSTEM_FOCUS'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_FOCUS' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'SYSTEM_FOCUS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             SYSTEM_FOCUS
                         </h2>
                         <ul className="space-y-1.5 text-xs text-foreground/80">
@@ -240,15 +280,18 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_SIGNALS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'SYSTEM_SIGNALS'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_SIGNALS' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'SYSTEM_SIGNALS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             SYSTEM_SIGNALS
                         </h2>
                         <div className="space-y-2 text-xs text-foreground/80">
@@ -276,15 +319,18 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('EXTERNAL_INTERFACES')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'EXTERNAL_INTERFACES'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'EXTERNAL_INTERFACES' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'EXTERNAL_INTERFACES' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
+                        style={{
+                            transitionDelay: '20ms',
+                        }}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             EXTERNAL_INTERFACES
                         </h2>
                         <div className="space-y-1.5 text-xs text-foreground/80">
@@ -292,35 +338,39 @@ export default function SystemOverview() {
                                 href="https://github.com/mayank-sharma-pant"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group"
+                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative"
+                                style={{ transitionDelay: '20ms' }}
                             >
                                 <span className="text-muted w-20">GITHUB</span>
-                                <span className="group-hover:underline">→ github.com/mayank-sharma-pant</span>
+                                <span className="relative">
+                                    → github.com/mayank-sharma-pant
+                                    <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                                </span>
                             </a>
                             <a
                                 href="https://linkedin.com/in/mayank-sharma-a747ba275/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group"
+                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
                             >
                                 <span className="text-muted w-20">LINKEDIN</span>
-                                <span className="group-hover:underline">→ linkedin.com/in/mayank-sharma-a747ba275/</span>
+                                <span className="relative">→ linkedin.com/in/mayank-sharma-a747ba275/</span>
                             </a>
                             <a
                                 href="https://x.com/nullbytez"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group"
+                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
                             >
                                 <span className="text-muted w-20">X</span>
-                                <span className="group-hover:underline">→ x.com/nullbytez</span>
+                                <span className="relative">→ x.com/nullbytez</span>
                             </a>
                             <a
                                 href="mailto:mayanksharmarrk01@gmail.com"
-                                className="flex gap-3 hover:text-primary transition-colors group"
+                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
                             >
                                 <span className="text-muted w-20">EMAIL</span>
-                                <span className="group-hover:underline">→ mayanksharmarrk01@gmail.com</span>
+                                <span className="relative">→ mayanksharmarrk01@gmail.com</span>
                             </a>
                         </div>
                     </motion.div>
@@ -334,15 +384,15 @@ export default function SystemOverview() {
                         onMouseEnter={() => handleCardHover('SYSTEM_STATUS')}
                         onMouseLeave={handleCardLeave}
                         className={`
-                            border p-4 transition-all duration-300 cursor-crosshair panel-glow
+                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
                             ${hoveredCard === 'SYSTEM_STATUS'
-                                ? 'bg-black/60 border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-                                : 'bg-black/40 border-primary/20'
+                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
+                                : 'bg-black/40 border-primary/20 elevation-low'
                             }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_STATUS' ? 'opacity-50' : 'opacity-100'}
+                            ${hoveredCard && hoveredCard !== 'SYSTEM_STATUS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
                         `}
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4">
+                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
                             SYSTEM_STATUS
                         </h2>
                         <div className="grid grid-cols-2 gap-4 text-xs">
@@ -362,3 +412,5 @@ export default function SystemOverview() {
         </div>
     );
 }
+
+

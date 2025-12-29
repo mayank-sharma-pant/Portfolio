@@ -1,21 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-
-interface Particle {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    size: number;
-    opacity: number;
-}
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function AnimatedBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const particlesRef = useRef<Particle[]>([]);
-    const mouseRef = useRef({ x: 0, y: 0 });
-    const animationFrameRef = useRef<number>();
+    const [scanlinePosition, setScanlinePosition] = useState(-100);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -32,131 +21,132 @@ export default function AnimatedBackground() {
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // Initialize particles - increased count for more visual impact
-        const particleCount = 120;
-        particlesRef.current = Array.from({ length: particleCount }, (_) => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.8,
-            vy: (Math.random() - 0.5) * 0.8,
-            size: Math.random() * 3 + 1,
-            opacity: Math.random() * 0.6 + 0.4,
-        }));
+        // Hexagonal grid parameters
+        const hexSize = 40;
+        const hexHeight = hexSize * Math.sqrt(3);
+        let pulsePhase = 0;
 
-        // Mouse tracking
-        const handleMouseMove = (e: MouseEvent) => {
-            mouseRef.current = { x: e.clientX, y: e.clientY };
+        // Draw hexagon
+        const drawHexagon = (x: number, y: number, size: number, opacity: number) => {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const hx = x + size * Math.cos(angle);
+                const hy = y + size * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(hx, hy);
+                } else {
+                    ctx.lineTo(hx, hy);
+                }
+            }
+            ctx.closePath();
+            ctx.strokeStyle = `rgba(63, 185, 224, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
         };
-        window.addEventListener('mousemove', handleMouseMove);
 
         // Animation loop
         const animate = () => {
-            // Darker fade for near-black base
-            ctx.fillStyle = 'rgba(7, 11, 20, 0.15)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const particles = particlesRef.current;
+            pulsePhase += 0.01;
 
-            // Update and draw particles
-            particles.forEach((particle, i) => {
-                // Update position
-                particle.x += particle.vx;
-                particle.y += particle.vy;
+            // Draw hexagonal grid
+            const cols = Math.ceil(canvas.width / (hexSize * 1.5)) + 2;
+            const rows = Math.ceil(canvas.height / hexHeight) + 2;
 
-                // Bounce off edges
-                if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-                if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            for (let row = -1; row < rows; row++) {
+                for (let col = -1; col < cols; col++) {
+                    const x = col * hexSize * 1.5;
+                    const y = row * hexHeight + (col % 2 === 0 ? 0 : hexHeight / 2);
 
-                // Mouse interaction - stronger effect
-                const dx = mouseRef.current.x - particle.x;
-                const dy = mouseRef.current.y - particle.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 200) {
-                    const force = (200 - distance) / 200;
-                    particle.x -= dx * 0.02 * force;
-                    particle.y -= dy * 0.02 * force;
-                }
+                    // Pulse effect - different hexagons pulse at different times
+                    const phaseOffset = (row * 0.3 + col * 0.2) % (Math.PI * 2);
+                    const pulse = Math.sin(pulsePhase + phaseOffset) * 0.5 + 0.5;
+                    const opacity = 0.08 + pulse * 0.07; // Increased from 0.02 + 0.03
 
-                // Draw particle with enhanced glow
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#06b6d4';
-                ctx.fillStyle = `rgba(6, 182, 212, ${particle.opacity})`;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                ctx.fill();
+                    drawHexagon(x, y, hexSize, opacity);
 
-                // Add extra glow layer
-                ctx.shadowBlur = 10;
-                ctx.fillStyle = `rgba(34, 211, 238, ${particle.opacity * 0.5})`;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size * 1.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                // Draw connections with gradient
-                particles.slice(i + 1).forEach((otherParticle) => {
-                    const dx = particle.x - otherParticle.x;
-                    const dy = particle.y - otherParticle.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 150) {
-                        const opacity = (1 - distance / 150) * 0.4;
-                        const gradient = ctx.createLinearGradient(
-                            particle.x, particle.y,
-                            otherParticle.x, otherParticle.y
-                        );
-                        gradient.addColorStop(0, `rgba(6, 182, 212, ${opacity})`);
-                        gradient.addColorStop(0.5, `rgba(34, 211, 238, ${opacity * 0.8})`);
-                        gradient.addColorStop(1, `rgba(6, 182, 212, ${opacity})`);
-
-                        ctx.strokeStyle = gradient;
-                        ctx.lineWidth = 1;
+                    // Occasional glow on intersections
+                    if (Math.random() > 0.997) {
                         ctx.beginPath();
-                        ctx.moveTo(particle.x, particle.y);
-                        ctx.lineTo(otherParticle.x, otherParticle.y);
-                        ctx.stroke();
+                        ctx.arc(x, y, 2, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(63, 185, 224, ${0.5 + pulse * 0.3})`; // Increased from 0.3 + 0.2
+                        ctx.fill();
                     }
-                });
-            });
+                }
+            }
 
-            animationFrameRef.current = requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
         };
 
         animate();
 
+        // Scanline sweep every 12 seconds
+        const scanlineInterval = setInterval(() => {
+            setScanlinePosition(-100);
+            const scanlineAnimation = setInterval(() => {
+                setScanlinePosition(prev => {
+                    if (prev >= window.innerHeight + 100) {
+                        clearInterval(scanlineAnimation);
+                        return -100;
+                    }
+                    return prev + 3;
+                });
+            }, 16);
+        }, 12000);
+
         return () => {
             window.removeEventListener('resize', resizeCanvas);
-            window.removeEventListener('mousemove', handleMouseMove);
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
+            clearInterval(scanlineInterval);
         };
     }, []);
 
     return (
         <>
-            {/* Particle Canvas - Felt, Not Visible */}
+            {/* Layer 1: Ambient Background - Hexagonal Grid */}
             <canvas
                 ref={canvasRef}
                 className="fixed inset-0 z-0 pointer-events-none"
-                style={{ opacity: 0.4 }}
+                style={{ opacity: 0.6 }}
             />
 
-            {/* Desaturated Gradient Waves */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute inset-0 animate-gradient-wave-1 opacity-10">
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-700/10 via-transparent to-slate-600/10" />
-                </div>
-                <div className="absolute inset-0 animate-gradient-wave-2 opacity-8">
-                    <div className="absolute inset-0 bg-gradient-to-tl from-slate-600/10 via-transparent to-slate-700/10" />
-                </div>
-            </div>
+            {/* Scanline Sweep */}
+            {scanlinePosition > -100 && scanlinePosition < window.innerHeight + 100 && (
+                <div
+                    className="fixed left-0 right-0 z-0 pointer-events-none animate-scanline"
+                    style={{
+                        top: `${scanlinePosition}px`,
+                        height: '2px',
+                        background: 'linear-gradient(90deg, transparent, rgba(63, 185, 224, 0.6), transparent)',
+                        boxShadow: '0 0 30px rgba(63, 185, 224, 0.8)',
+                    }}
+                />
+            )}
 
-            {/* Subtle Glowing Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-slate-600/5 rounded-full blur-3xl animate-float-slow" />
-                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-slate-700/5 rounded-full blur-3xl animate-float-slower" />
-            </div>
+            {/* Slow Gradient Drift - 45s Loop */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none animate-gradient-drift"
+                style={{
+                    background: `
+                        linear-gradient(
+                            135deg,
+                            rgba(18, 24, 38, 0.3) 0%,
+                            rgba(7, 11, 20, 0) 50%,
+                            rgba(18, 24, 38, 0.2) 100%
+                        )
+                    `,
+                    backgroundSize: '200% 200%',
+                }}
+            />
+
+            {/* Subtle Noise Texture */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none opacity-[0.015]"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}
+            />
         </>
     );
 }

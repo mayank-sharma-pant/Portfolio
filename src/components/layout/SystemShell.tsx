@@ -21,16 +21,32 @@ const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
     <button
         onClick={onClick}
         onMouseEnter={() => synth.playHover()}
-        className={`w-full flex items-center gap-4 p-4 transition-all duration-300 border-l-2 relative overflow-hidden group ${active
-            ? 'border-primary bg-primary/10 text-primary'
-            : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'
-            }`}
+        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group
+            border-l-2 transition-all duration-[280ms] ease-in-out
+            ${active
+                ? 'border-primary bg-primary/10 text-primary elevation-mid'
+                : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'
+            }
+        `}
+        style={{
+            transitionDelay: '20ms',
+        }}
     >
-        <Icon className={`w-5 h-5 ${active ? 'animate-pulse' : ''}`} />
-        <span className="font-mono text-sm tracking-wider">{label}</span>
+        <Icon className={`w-5 h-5 transition-transform duration-200 ${active ? 'animate-pulse' : 'group-hover:scale-110'
+            }`} />
+        <span className="font-mono text-sm tracking-wider relative">
+            {label}
+            {/* Underline grow on hover */}
+            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+        </span>
 
         {/* Hover Scanline */}
         <div className="absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 pointer-events-none" />
+
+        {/* Active glow */}
+        {active && (
+            <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
+        )}
     </button>
 );
 
@@ -99,9 +115,16 @@ export default function SystemShell({ children }: { children: React.ReactNode })
             </AnimatePresence>
 
             {/* Top Status Bar */}
-            <header className="h-12 border-b border-border bg-background/80 backdrop-blur-md z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0">
-                <button onClick={handleSystemReset} className="flex items-center gap-6 hover:opacity-80 transition-opacity">
-                    <span className="text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">SYSTEM_HVY.OS</span>
+            <header className="h-12 border-b border-border bg-background/80 backdrop-blur-md z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0 elevation-low">
+                <button
+                    onClick={handleSystemReset}
+                    className="flex items-center gap-6 hover:opacity-80 transition-all duration-[280ms] ease-in-out group"
+                    style={{ transitionDelay: '20ms' }}
+                >
+                    <span className="text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] relative">
+                        SYSTEM_HVY.OS
+                        <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                    </span>
                     <span className="hidden sm:inline-block opacity-50">KERNEL: 5.0.0-rc1</span>
                 </button>
                 <div className="flex items-center gap-4">
@@ -113,7 +136,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
             <div className="flex-1 flex overflow-hidden relative z-10">
 
                 {/* Left Sidebar (Module Selector) */}
-                <aside className="w-64 border-r border-border bg-black/20 backdrop-blur-sm hidden md:flex flex-col">
+                <aside className="w-64 border-r border-border bg-black/20 backdrop-blur-sm hidden md:flex flex-col elevation-low">
                     <div className="p-4 text-xs font-mono text-muted uppercase tracking-widest opacity-50 mb-2">Modules</div>
 
                     {/* HOME Button */}

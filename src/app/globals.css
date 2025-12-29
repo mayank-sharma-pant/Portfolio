@@ -30,6 +30,19 @@
   /* Thin calm borders */
   --card: rgba(18, 24, 38, 0.78);
   /* Neutral dark panels */
+
+  /* Elevation System - 3 Layer Depth */
+  --elevation-low: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --elevation-mid: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --elevation-high: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.5);
+
+  /* Focus Glow - Soft Light */
+  --focus-glow: 0 0 20px rgba(63, 185, 224, 0.15), 0 0 40px rgba(63, 185, 224, 0.08);
+
+  /* Motion Timing - Weighted & Deliberate */
+  --transition-delay: 20ms;
+  --transition-duration: 280ms;
+  --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Enforce Dark Mode */
@@ -67,24 +80,53 @@ body {
   /* Better breathing room */
 }
 
-/* Readability Shield - Dims mesh behind content */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-  background: linear-gradient(rgba(7, 11, 20, 0.85),
-      rgba(7, 11, 20, 0.85));
+/* Micro-Interaction Animations */
+@keyframes underlineGrow {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
-/* Ensure content appears above shield */
-body>* {
-  position: relative;
-  z-index: 2;
+@keyframes clickCompress {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.98);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes borderSharpen {
+  from {
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  to {
+    border-color: rgba(120, 160, 200, 0.4);
+    box-shadow: 0 0 0 1px rgba(120, 160, 200, 0.2);
+  }
+}
+
+@keyframes faintPulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Data pulse effect - minimal */
@@ -116,9 +158,11 @@ body>* {
   animation: dataPulse 400ms ease-out;
 }
 
-/* Panel glow - very subtle, cyan accent */
+/* Panel glow - dynamic lighting */
 .panel-glow {
   position: relative;
+  transition: transform var(--transition-duration) var(--transition-easing) var(--transition-delay),
+    box-shadow var(--transition-duration) var(--transition-easing) var(--transition-delay);
 }
 
 .panel-glow::after {
@@ -126,11 +170,11 @@ body>* {
   position: absolute;
   inset: -10px;
   background: radial-gradient(circle at center,
-      rgba(63, 185, 224, 0.04) 0%,
+      rgba(63, 185, 224, 0.06) 0%,
       transparent 70%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 200ms ease-out;
+  transition: opacity var(--transition-duration) var(--transition-easing) var(--transition-delay);
   z-index: -1;
 }
 
@@ -138,6 +182,70 @@ body>* {
 .panel-glow:focus-within::after,
 .panel-glow[data-active="true"]::after {
   opacity: 1;
+}
+
+/* Elevation states */
+.elevation-low {
+  box-shadow: var(--elevation-low);
+}
+
+.elevation-mid {
+  box-shadow: var(--elevation-mid);
+}
+
+.elevation-high {
+  box-shadow: var(--elevation-high);
+}
+
+.focus-glow {
+  box-shadow: var(--focus-glow);
+}
+
+/* Background Animation Keyframes - Weighted & Slow */
+@keyframes gradientDrift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes gridPulse {
+
+  0%,
+  100% {
+    opacity: 0.02;
+  }
+
+  50% {
+    opacity: 0.04;
+  }
+}
+
+@keyframes scanlineSweep {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+.animate-gradient-drift {
+  animation: gradientDrift 20s linear infinite;
+}
+
+.animate-grid-pulse {
+  animation: gridPulse 8s ease-in-out infinite;
+}
+
+.animate-scanline {
+  animation: scanlineSweep 3s linear infinite;
 }
 
 /* Custom Scrollbar */
