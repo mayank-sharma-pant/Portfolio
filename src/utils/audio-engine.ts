@@ -12,7 +12,7 @@ class AudioSynth {
             if (AudioCtx) {
                 this.ctx = new AudioCtx();
                 this.masterGain = this.ctx.createGain();
-                this.masterGain.gain.value = 0.15; // Keep it subtle
+                this.masterGain.gain.value = 0.5; // Increased volume
                 this.masterGain.connect(this.ctx.destination);
             }
         }
@@ -150,6 +150,69 @@ class AudioSynth {
 
         osc.start();
         osc.stop(this.ctx!.currentTime + 0.3);
+    }
+    private ambientOsc: OscillatorNode | null = null;
+    private ambientGain: GainNode | null = null;
+
+    public toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.isMuted) {
+            this.stopAmbient();
+            if (this.ctx && this.ctx.state === 'running') {
+                this.ctx.suspend();
+            }
+        } else {
+            if (this.ctx && this.ctx.state === 'suspended') {
+                this.ctx.resume();
+            }
+            this.playAmbient();
+        }
+        return this.isMuted;
+    }
+
+    public getMuted() {
+        return this.isMuted;
+    }
+
+    public start() {
+        this.initCheck();
+        if (!this.isMuted) {
+            this.playAmbient();
+        }
+    }
+
+    private playAmbient() {
+        if (!this.initCheck() || this.isMuted || this.ambientOsc) return;
+
+        // Create a low drone
+        this.ambientOsc = this.ctx!.createOscillator();
+        this.ambientGain = this.ctx!.createGain();
+
+        this.ambientOsc.type = 'sine';
+        this.ambientOsc.frequency.setValueAtTime(50, this.ctx!.currentTime); // Low rumble
+
+        // Louder ambient
+        this.ambientGain.gain.setValueAtTime(0.00, this.ctx!.currentTime);
+        this.ambientGain.gain.linearRampToValueAtTime(0.08, this.ctx!.currentTime + 2); // Fade in
+
+        this.ambientOsc.connect(this.ambientGain);
+        this.ambientGain.connect(this.masterGain!);
+
+        this.ambientOsc.start();
+    }
+
+    private stopAmbient() {
+        if (this.ambientOsc) {
+            try {
+                this.ambientOsc.stop();
+                this.ambientOsc.disconnect();
+                this.ambientGain?.disconnect();
+            } catch (e) {
+                // Ignore if already stopped
+            }
+            this.ambientOsc = null;
+            this.ambientGain = null;
+        }
     }
 }
 

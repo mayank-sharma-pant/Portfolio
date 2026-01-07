@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useSystem } from '@/context/SystemContext';
 import { synth } from '@/utils/audio-engine';
 import SystemPanel from '@/components/ui/SystemPanel';
+import SoundToggle from '@/components/ui/SoundToggle';
 
 export default function SystemOverview() {
     const { pushLog } = useSystem();
@@ -61,6 +62,8 @@ export default function SystemOverview() {
                     <div className="h-full w-[200px] bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-xl" />
                 </motion.div>
             )}
+
+            <SoundToggle />
 
             <div className="max-w-5xl w-full space-y-8 font-mono text-sm">
 
