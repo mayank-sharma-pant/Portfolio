@@ -74,6 +74,17 @@ export default function SystemPanel({
                 `}
             />
 
+            {/* Holographic Scan Effect */}
+            <div
+                className={`
+                    absolute inset-0 pointer-events-none overflow-hidden
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                `}
+            >
+                <div className="w-full h-[2px] bg-primary/30 blur-[2px] absolute top-0 -translate-y-full animate-[scan_2s_ease-in-out_infinite]" />
+                <div className="w-full h-[15px] bg-gradient-to-b from-primary/10 to-transparent absolute top-0 -translate-y-full animate-[scan_2s_ease-in-out_infinite_0.1s]" />
+            </div>
+
             {/* Title Header (Optional) */}
             {title && (
                 <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 group-hover:border-primary/20 transition-colors">

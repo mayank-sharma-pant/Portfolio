@@ -6,6 +6,7 @@ import { useSystem } from '@/context/SystemContext';
 import { synth } from '@/utils/audio-engine';
 import SystemPanel from '@/components/ui/SystemPanel';
 import SoundToggle from '@/components/ui/SoundToggle';
+import GlitchText from '@/components/ui/GlitchText';
 
 export default function SystemOverview() {
     const { pushLog } = useSystem();
@@ -70,7 +71,8 @@ export default function SystemOverview() {
                 {/* Page Title */}
                 <div className="border-b border-primary/20 pb-6 mb-8">
                     <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                        <span className="text-primary">{'>'}</span> SYSTEM_OVERVIEW
+                        <span className="text-primary">{'>'}</span>
+                        <GlitchText text="SYSTEM_OVERVIEW" reveal={true} />
                     </h1>
                 </div>
 
