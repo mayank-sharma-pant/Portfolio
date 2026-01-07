@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSystem } from '@/context/SystemContext';
 import { synth } from '@/utils/audio-engine';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+import SystemPanel from '@/components/ui/SystemPanel';
 
 interface Command {
     id: string;
@@ -138,21 +139,15 @@ export default function SystemCommandsView() {
             {/* Command Groups */}
             <div className="space-y-8">
                 {commandGroups.slice(0, visibleGroups).map((group, groupIndex) => (
-                    <motion.div
+                    <SystemPanel
                         key={group.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-3"
+                        id={`CMD_GROUP_${group.id}`}
+                        title={group.name}
+                        className="p-0 overflow-hidden bg-black/40 backdrop-blur-sm"
+                        noLift={true} // Commands internal list shouldn't lift the whole panel too much
                     >
-                        {/* Group Header */}
-                        <div className="text-primary text-xs tracking-wider">
-                            {group.name}
-                        </div>
-                        <div className="border-b border-primary/10 mb-4"></div>
-
                         {/* Commands */}
-                        <div className="space-y-2 pl-4">
+                        <div className="p-4 space-y-1">
                             {group.commands.map((command, cmdIndex) => (
                                 <motion.div
                                     key={command.id}
@@ -160,13 +155,16 @@ export default function SystemCommandsView() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: cmdIndex * 0.05 }}
                                     onMouseEnter={() => handleCommandHover(command.id, command.name)}
-                                    onMouseLeave={() => setHoveredCommand(null)}
+                                    // onMouseLeave handled by parent panel mostly, but granular hover needed for command details
                                     onClick={() => handleCommandClick(command.id, command.name)}
-                                    className="cursor-pointer group"
+                                    className="cursor-pointer group relative"
                                 >
                                     {/* Command Line */}
-                                    <div className={`flex items-start gap-2 transition-colors duration-200 ${hoveredCommand === command.id ? 'text-primary' : 'text-foreground/80'
-                                        }`}>
+                                    <div className={`
+                                            flex items-start gap-2 p-2 rounded-sm transition-all duration-200
+                                            ${expandedCommand === command.id ? 'bg-primary/10' : 'hover:bg-white/5'}
+                                            ${hoveredCommand === command.id ? 'text-primary' : 'text-foreground/80'}
+                                        `}>
                                         <span className="text-primary/50 mt-0.5">{'>'}</span>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
@@ -219,7 +217,7 @@ export default function SystemCommandsView() {
                                 </motion.div>
                             ))}
                         </div>
-                    </motion.div>
+                    </SystemPanel>
                 ))}
             </div>
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSystem } from '@/context/SystemContext';
 import { synth } from '@/utils/audio-engine';
+import SystemPanel from '@/components/ui/SystemPanel';
 
 export default function SystemOverview() {
     const { pushLog } = useSystem();
@@ -70,33 +71,15 @@ export default function SystemOverview() {
                     </h1>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
 
                     {/* SYSTEM_ID Card */}
-                    <motion.div
-                        custom={0}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('SYSTEM_ID')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm
-                            transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'SYSTEM_ID'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_ID' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="SYSTEM_ID"
+                        title="SYSTEM_ID"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold font-bold">
-                            SYSTEM_ID
-                        </h2>
-                        <div className="space-y-2.5 text-xs">
+                        <div className="p-5 space-y-2.5 text-xs text-foreground/80 font-mono">
                             <div className="flex gap-4">
                                 <span className="text-muted w-20">NAME:</span>
                                 <span className="text-foreground font-bold">Mayank Sharma</span>
@@ -112,189 +95,111 @@ export default function SystemOverview() {
                                 </span>
                             </div>
                         </div>
-                    </motion.div>
+                    </SystemPanel>
 
                     {/* CAPABILITIES Card */}
-                    <motion.div
-                        custom={0.1}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('CAPABILITIES')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'CAPABILITIES'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'CAPABILITIES' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="CAPABILITIES"
+                        title="CAPABILITIES"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            CAPABILITIES
-                        </h2>
-                        <ul className="space-y-1.5 text-xs text-foreground/80">
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Design and build REST APIs</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Implement clean backend architecture</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Develop Android applications</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Ship MVPs with real users</span>
-                            </li>
-                        </ul>
-                    </motion.div>
+                        <div className="p-5">
+                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Design and build REST APIs</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Implement clean backend architecture</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Develop Android applications</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Ship MVPs with real users</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </SystemPanel>
 
                     {/* CURRENT_ROLE Card */}
-                    <motion.div
-                        custom={0.2}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('CURRENT_ROLE')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'CURRENT_ROLE'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'CURRENT_ROLE' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="CURRENT_ROLE"
+                        title="CURRENT_ROLE"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            CURRENT_ROLE
-                        </h2>
-                        <ul className="space-y-1.5 text-xs text-foreground/80">
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">›</span>
-                                <span>Backend Developer Intern — Enterprise APIs</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">›</span>
-                                <span>Product-Focused Engineer — Healiora MVP</span>
-                            </li>
-                        </ul>
-                    </motion.div>
+                        <div className="p-5">
+                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">›</span>
+                                    <span>Backend Developer Intern — Enterprise APIs</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">›</span>
+                                    <span>Product-Focused Engineer — Healiora MVP</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </SystemPanel>
 
                     {/* EXECUTION_CONTEXT Card */}
-                    <motion.div
-                        custom={0.3}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('EXECUTION_CONTEXT')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm
-                            transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'EXECUTION_CONTEXT'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'EXECUTION_CONTEXT' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="EXECUTION_CONTEXT"
+                        title="EXECUTION_CONTEXT"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            EXECUTION_CONTEXT
-                        </h2>
-                        <ul className="space-y-1.5 text-xs text-foreground/80">
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Backend Intern — SunEdge IT Solutions</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>Co-founder — Healiora (CU-TBI Incubated)</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">•</span>
-                                <span>B.Tech CSE — Chandigarh University</span>
-                            </li>
-                        </ul>
-                    </motion.div>
+                        <div className="p-5">
+                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Backend Intern — SunEdge IT Solutions</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>Co-founder — Healiora (CU-TBI Incubated)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">•</span>
+                                    <span>B.Tech CSE — Chandigarh University</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </SystemPanel>
 
                     {/* SYSTEM_FOCUS Card */}
-                    <motion.div
-                        custom={0.4}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('SYSTEM_FOCUS')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'SYSTEM_FOCUS'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_FOCUS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="SYSTEM_FOCUS"
+                        title="SYSTEM_FOCUS"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            SYSTEM_FOCUS
-                        </h2>
-                        <ul className="space-y-1.5 text-xs text-foreground/80">
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">›</span>
-                                <span>Backend APIs & clean architecture</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">›</span>
-                                <span>Real-world product development</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-primary/50 mt-0.5">›</span>
-                                <span>Frontend fundamentals & interaction systems</span>
-                            </li>
-                        </ul>
-                    </motion.div>
+                        <div className="p-5">
+                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">›</span>
+                                    <span>Backend APIs & clean architecture</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">›</span>
+                                    <span>Real-world product development</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-primary/50 mt-0.5">›</span>
+                                    <span>Frontend fundamentals & interaction systems</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </SystemPanel>
 
                     {/* SYSTEM_SIGNALS Card */}
-                    <motion.div
-                        custom={0.5}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('SYSTEM_SIGNALS')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'SYSTEM_SIGNALS'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_SIGNALS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="SYSTEM_SIGNALS"
+                        title="SYSTEM_SIGNALS"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            SYSTEM_SIGNALS
-                        </h2>
-                        <div className="space-y-2 text-xs text-foreground/80">
+                        <div className="p-5 space-y-2 text-xs text-foreground/80 font-mono">
                             <div className="flex gap-3">
                                 <span className="text-muted w-28">ACTIVE_MODULES:</span>
                                 <span>Projects, Dependencies, Sys Logs</span>
@@ -308,38 +213,20 @@ export default function SystemOverview() {
                                 <span>Skill Expansion (Frontend)</span>
                             </div>
                         </div>
-                    </motion.div>
+                    </SystemPanel>
 
                     {/* EXTERNAL_INTERFACES Card */}
-                    <motion.div
-                        custom={0.6}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('EXTERNAL_INTERFACES')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'EXTERNAL_INTERFACES'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'EXTERNAL_INTERFACES' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
-                        style={{
-                            transitionDelay: '20ms',
-                        }}
+                    <SystemPanel
+                        id="EXTERNAL_INTERFACES"
+                        title="EXTERNAL_INTERFACES"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            EXTERNAL_INTERFACES
-                        </h2>
-                        <div className="space-y-1.5 text-xs text-foreground/80">
+                        <div className="p-5 space-y-1.5 text-xs text-foreground/80 font-mono">
                             <a
                                 href="https://github.com/mayank-sharma-pant"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative"
-                                style={{ transitionDelay: '20ms' }}
+                                className="flex gap-3 hover:text-primary transition-colors group relative"
                             >
                                 <span className="text-muted w-20">GITHUB</span>
                                 <span className="relative">
@@ -351,7 +238,7 @@ export default function SystemOverview() {
                                 href="https://linkedin.com/in/mayank-sharma-a747ba275/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
+                                className="flex gap-3 hover:text-primary transition-colors group relative"
                             >
                                 <span className="text-muted w-20">LINKEDIN</span>
                                 <span className="relative">→ linkedin.com/in/mayank-sharma-a747ba275/</span>
@@ -360,42 +247,28 @@ export default function SystemOverview() {
                                 href="https://x.com/nullbytez"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
+                                className="flex gap-3 hover:text-primary transition-colors group relative"
                             >
                                 <span className="text-muted w-20">X</span>
                                 <span className="relative">→ x.com/nullbytez</span>
                             </a>
                             <a
                                 href="mailto:mayanksharmarrk01@gmail.com"
-                                className="flex gap-3 hover:text-primary transition-all duration-[280ms] ease-in-out group relative" style={{ transitionDelay: '20ms' }}
+                                className="flex gap-3 hover:text-primary transition-colors group relative"
                             >
                                 <span className="text-muted w-20">EMAIL</span>
                                 <span className="relative">→ mayanksharmarrk01@gmail.com</span>
                             </a>
                         </div>
-                    </motion.div>
+                    </SystemPanel>
 
                     {/* SYSTEM_STATUS Card */}
-                    <motion.div
-                        custom={0.7}
-                        initial="hidden"
-                        animate={mounted ? "visible" : "hidden"}
-                        variants={sectionVariants}
-                        onMouseEnter={() => handleCardHover('SYSTEM_STATUS')}
-                        onMouseLeave={handleCardLeave}
-                        className={`
-                            border p-5 cursor-crosshair panel-glow backdrop-blur-sm transition-all duration-[280ms] ease-in-out
-                            ${hoveredCard === 'SYSTEM_STATUS'
-                                ? 'bg-black/70 border-primary/60 elevation-mid scale-[1.02]'
-                                : 'bg-black/40 border-primary/20 elevation-low'
-                            }
-                            ${hoveredCard && hoveredCard !== 'SYSTEM_STATUS' ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
-                        `}
+                    <SystemPanel
+                        id="SYSTEM_STATUS"
+                        title="SYSTEM_STATUS"
+                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
                     >
-                        <h2 className="text-xs uppercase tracking-widest text-primary mb-4 font-bold">
-                            SYSTEM_STATUS
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="p-5 grid grid-cols-2 gap-4 text-xs font-mono">
                             <div>
                                 <span className="text-muted block mb-1">MODE</span>
                                 <span className="text-foreground tracking-wider">LEARNING + BUILDING</span>
@@ -405,7 +278,7 @@ export default function SystemOverview() {
                                 <span className="text-primary/90">Active modules running</span>
                             </div>
                         </div>
-                    </motion.div>
+                    </SystemPanel>
 
                 </div>
             </div>

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion'; // Removed Activity, Shield, Zap imports as they used widely
+import { motion } from 'framer-motion';
 import { useSystem } from '@/context/SystemContext';
+import SystemPanel from '@/components/ui/SystemPanel';
 
 export default function HealioraView() {
     const { pushLog } = useSystem();
@@ -52,13 +53,13 @@ export default function HealioraView() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
             <motion.div
-                className="max-w-2xl w-full border-l-2 border-primary/20 pl-8 md:pl-12 py-8 space-y-12 relative"
+                className="max-w-2xl w-full space-y-8 relative"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 {/* 1. PRODUCT IDENTITY BLOCK */}
-                <motion.div variants={itemVariants} className="space-y-2">
+                <motion.div variants={itemVariants} className="pl-6 border-l-2 border-primary/20">
                     <div className="text-xs font-mono text-muted tracking-widest mb-1">PRODUCT_NODE</div>
                     <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
                         Healiora
@@ -78,98 +79,104 @@ export default function HealioraView() {
                     </div>
                 </motion.div>
 
-                {/* 2. CURRENT STATE (VERY IMPORTANT) */}
-                <motion.div variants={itemVariants} className="relative">
-                    <div className="absolute -left-[49px] md:-left-[65px] top-0 w-3 h-3 bg-primary/20 border border-primary/50" />
-                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
-                        Current_State
-                    </h2>
-                    <ul className="space-y-3 font-mono text-sm text-muted">
-                        <li className="flex items-start gap-3">
-                            <span className="text-primary mt-1">→</span>
-                            <span className="text-foreground/90">Actively building the Healiora platform</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <span className="text-primary mt-1">→</span>
-                            <span className="text-foreground/90">Preparing for initial public launch</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <span className="text-primary mt-1">→</span>
-                            <span className="text-foreground/90">Iterating based on early validation</span>
-                        </li>
-                    </ul>
+                {/* 2. CURRENT STATE & INCUBATION (Grouped in Panel) */}
+                <motion.div variants={itemVariants}>
+                    <SystemPanel id="HEALIORA_STATE" title="CURRENT_STATE" className="backdrop-blur-sm bg-black/40">
+                        <div className="p-6 space-y-6">
+                            <div className="space-y-3 font-mono text-sm text-muted">
+                                <div className="flex items-start gap-3">
+                                    <span className="text-primary mt-1">→</span>
+                                    <span className="text-foreground/90">Actively building the Healiora platform</span>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <span className="text-primary mt-1">→</span>
+                                    <span className="text-foreground/90">Preparing for initial public launch</span>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <span className="text-primary mt-1">→</span>
+                                    <span className="text-foreground/90">Iterating based on early validation</span>
+                                </div>
+                            </div>
+
+                            {/* Incubation Sub-section */}
+                            <div className="pt-4 border-t border-border">
+                                <h3 className="text-xs font-bold text-muted tracking-widest mb-3 uppercase opacity-70">
+                                    Incubation Context
+                                </h3>
+                                <div className="p-3 border border-primary/10 bg-primary/5 rounded-sm">
+                                    <ul className="space-y-2 font-mono text-xs text-muted/80">
+                                        <li>• Incubated under CU-TBI (Chandigarh University)</li>
+                                        <li>• Supported through mentorship and guidance</li>
+                                        <li>• Focused on building a viable healthcare MVP</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </SystemPanel>
                 </motion.div>
 
-                {/* 3. INCUBATION */}
+                {/* 3. SCOPE & ROLE (Grouped in Panel) */}
                 <motion.div variants={itemVariants}>
-                    <h2 className="text-xs font-bold text-muted tracking-widest mb-3 uppercase opacity-70">
-                        Incubation
-                    </h2>
-                    <div className="p-4 border border-primary/10 bg-primary/5 backdrop-blur-sm">
-                        <ul className="space-y-2 font-mono text-xs text-muted/80">
-                            <li>• Incubated under CU-TBI (Chandigarh University)</li>
-                            <li>• Supported through mentorship and guidance</li>
-                            <li>• Focused on building a viable healthcare MVP</li>
-                        </ul>
+                    <SystemPanel id="HEALIORA_DETAILS" title="PRODUCT_DETAILS" className="backdrop-blur-sm bg-black/40">
+                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                            {/* Product Scope */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-foreground tracking-widest uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                                    Product_Scope
+                                </h3>
+                                <div className="space-y-2 font-mono text-xs text-muted">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-primary/40" /> Patient-side application
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-primary/40" /> Hospital / provider interface
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-primary/40" /> Secure backend systems
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-primary/40" /> Focus on clean workflows
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Role */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-foreground tracking-widest uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                                    Role & Responsibility
+                                </h3>
+                                <ul className="space-y-2 font-mono text-xs text-muted/90">
+                                    <li>• Co-founder and product-focused engineer</li>
+                                    <li>• Responsible for product direction</li>
+                                    <li>• Backend system design and APIs</li>
+                                    <li>• Involved in application flows and UX decisions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </SystemPanel>
+                </motion.div>
+
+                {/* 4. WHAT'S NEXT (Small Panel) */}
+                <motion.div variants={itemVariants}>
+                    <SystemPanel id="HEALIORA_ROADMAP" title="NEXT_PHASE" className="backdrop-blur-sm bg-black/40">
+                        <div className="p-4">
+                            <ul className="space-y-2 font-mono text-xs text-muted italic opacity-70">
+                                <li>.. Completing core MVP flows</li>
+                                <li>.. Preparing for wider release</li>
+                                <li>.. Refining system stability and UX</li>
+                            </ul>
+                        </div>
+                    </SystemPanel>
+                </motion.div>
+
+                {/* 5. STATUS FOOTER */}
+                <motion.div variants={itemVariants} className="pt-4 flex items-center justify-between font-mono text-[10px] text-muted tracking-wider uppercase">
+                    <div>
+                        NODE_STATE: <span className="text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">ACTIVE</span>
                     </div>
-                </motion.div>
-
-                {/* 4. PRODUCT SCOPE */}
-                <motion.div variants={itemVariants}>
-                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
-                        Product_Scope
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 font-mono text-xs text-muted">
-                        <div className="flex items-center gap-2">
-                            <span className="w-1 h-1 bg-primary/40" /> Patient-side application
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-1 h-1 bg-primary/40" /> Hospital / provider interface
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-1 h-1 bg-primary/40" /> Secure backend systems
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-1 h-1 bg-primary/40" /> Focus on clean workflows
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* 5. ROLE & RESPONSIBILITY */}
-                <motion.div variants={itemVariants} className="relative">
-                    <div className="absolute -left-[49px] md:-left-[65px] top-1 w-2 h-2 rounded-full bg-muted/20" />
-                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
-                        Role & Responsibility
-                    </h2>
-                    <ul className="space-y-2 font-mono text-xs text-muted/90">
-                        <li>• Co-founder and product-focused engineer</li>
-                        <li>• Responsible for product direction</li>
-                        <li>• Backend system design and APIs</li>
-                        <li>• Involved in application flows and UX decisions</li>
-                    </ul>
-                </motion.div>
-
-                {/* 6. WHAT'S NEXT */}
-                <motion.div variants={itemVariants}>
-                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
-                        Next_Phase
-                    </h2>
-                    <ul className="space-y-2 font-mono text-xs text-muted italic opacity-70">
-                        <li>.. Completing core MVP flows</li>
-                        <li>.. Preparing for wider release</li>
-                        <li>.. Refining system stability and UX</li>
-                    </ul>
-                </motion.div>
-
-                {/* 7. STATUS FOOTER */}
-                <motion.div variants={itemVariants} className="pt-8 mt-4 border-t border-primary/10">
-                    <div className="flex items-center justify-between font-mono text-[10px] text-muted tracking-wider uppercase">
-                        <div>
-                            NODE_STATE: <span className="text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">ACTIVE</span>
-                        </div>
-                        <div>
-                            LAUNCH_PHASE: UPCOMING
-                        </div>
+                    <div>
+                        LAUNCH_PHASE: UPCOMING
                     </div>
                 </motion.div>
 
