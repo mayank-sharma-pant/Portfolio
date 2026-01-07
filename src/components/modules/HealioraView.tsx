@@ -1,143 +1,179 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Activity, Shield, Zap, GitBranch, Server, Globe, Lock } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { motion } from 'framer-motion'; // Removed Activity, Shield, Zap imports as they used widely
+import { useSystem } from '@/context/SystemContext';
 
 export default function HealioraView() {
+    const { pushLog } = useSystem();
+
+    useEffect(() => {
+        // Initial log sequence on mount
+        const timer1 = setTimeout(() => pushLog('Loading PRODUCT_NODE: HEALIORA', 'SYSTEM'), 100);
+        const timer2 = setTimeout(() => pushLog('Status: ACTIVE', 'SYSTEM'), 400);
+        const timer3 = setTimeout(() => pushLog('Incubation verified', 'SYSTEM'), 800);
+
+        return () => {
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+            clearTimeout(timer3);
+        };
+    }, [pushLog]);
+
+    // Parent container variants for staggered children
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2, // Slower stagger
+                delayChildren: 0.3    // Initial delay
+            }
+        }
+    };
+
+    // Item variants for "Heavy" feel
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.8, // Slower transition
+                ease: [0.2, 0.65, 0.3, 0.9] // Custom heavy ease
+            }
+        }
+    };
+
     return (
-        <div className="space-y-8 max-w-5xl mx-auto">
-            {/* Primary Header */}
-            <div className="flex flex-col gap-2 border-b-2 border-primary pb-6">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                        <Activity className="w-8 h-8 text-primary animate-pulse" />
-                        <span className="tracking-[0.2em]">HEALIORA_PRIME</span>
-                    </h2>
-                    <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/50 text-primary text-xs font-bold tracking-wider rounded-sm shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                        STATUS: INCUBATED
-                    </div>
-                </div>
-                <div className="flex items-center gap-6 text-xs font-mono text-muted mt-2">
-                    <span>ROLE: CO-FOUNDER | PRODUCT_LEAD</span>
-                    <span>ACCESS_LEVEL: ADMIN / ROOT</span>
-                    <span>UPTIME: 99.98%</span>
-                </div>
-            </div>
+        <div className="min-h-full flex flex-col items-center justify-center p-4 md:p-12 relative overflow-hidden">
 
-            {/* Dashboard Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Background Focus Glow - Subtle */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-                {/* Left Column: Mission & Core Stats */}
-                <div className="space-y-6">
-                    {/* Mission Card */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-black/30 border border-border p-6 relative group overflow-hidden"
-                    >
-                        <h3 className="text-sm text-muted font-bold tracking-widest mb-4 flex items-center gap-2">
-                            <Globe className="w-4 h-4" /> DIRECTIVE // MISSION
-                        </h3>
-                        <p className="font-mono text-sm leading-relaxed text-foreground/90">
-                            Developing an AI-driven ecosystem to optimize healthcare coordination.
-                            Streamlining patient-provider communication through autonomous agents and predictive analytics.
-                        </p>
-
-                        {/* Decorative corner */}
-                        <div className="absolute top-0 right-0 p-2">
-                            <div className="w-2 h-2 bg-primary/50" />
-                        </div>
-                    </motion.div>
-
-                    {/* System Health / Contribution Stats */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-black/30 border border-border p-4"
-                        >
-                            <div className="text-xs text-muted font-mono mb-2">CONTRIBUTION</div>
-                            <div className="text-2xl font-bold text-white mb-1">Architecture</div>
-                            <div className="h-1 w-full bg-secondary overflow-hidden">
-                                <div className="h-full w-[90%] bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                            </div>
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="bg-black/30 border border-border p-4"
-                        >
-                            <div className="text-xs text-muted font-mono mb-2">SYSTEM_LOAD</div>
-                            <div className="text-2xl font-bold text-white mb-1">High</div>
-                            <div className="h-1 w-full bg-secondary overflow-hidden">
-                                <div className="h-full w-[75%] bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-
-                {/* Right Column: Technical Stack Details */}
-                <div className="space-y-6">
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-black/30 border border-border p-6 h-full relative"
-                    >
-                        <h3 className="text-sm text-muted font-bold tracking-widest mb-6 flex items-center gap-2">
-                            <Server className="w-4 h-4" /> CORE_INFRASTRUCTURE
-                        </h3>
-
-                        <ul className="space-y-4 font-mono text-sm">
-                            <li className="flex items-center justify-between group">
-                                <span className="text-muted group-hover:text-primary transition-colors">Backend Core</span>
-                                <span className="text-foreground">Node.js / Express</span>
-                            </li>
-                            <li className="flex items-center justify-between group">
-                                <span className="text-muted group-hover:text-primary transition-colors">Data Layer</span>
-                                <span className="text-foreground">PostgreSQL + Redis</span>
-                            </li>
-                            <li className="flex items-center justify-between group">
-                                <span className="text-muted group-hover:text-primary transition-colors">AI Agents</span>
-                                <span className="text-foreground">Python / LangChain</span>
-                            </li>
-                            <li className="flex items-center justify-between group">
-                                <span className="text-muted group-hover:text-primary transition-colors">Deploy</span>
-                                <span className="text-foreground">AWS (ECS / Fargate)</span>
-                            </li>
-                        </ul>
-
-                        {/* Security Badge */}
-                        <div className="mt-8 flex items-center justify-center p-4 bg-primary/5 border border-primary/20 rounded-sm">
-                            <Shield className="w-5 h-5 text-primary mr-3" />
-                            <span className="font-mono text-xs text-primary font-bold">HIPAA_COMPLIANCE_MODE: ACTIVE</span>
-                        </div>
-                    </motion.div>
-                </div>
-            </div>
-
-            {/* Bottom: Roadmap / Terminal */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="bg-black/40 border-t-2 border-primary/30 p-4 font-mono text-xs text-muted"
+                className="max-w-2xl w-full border-l-2 border-primary/20 pl-8 md:pl-12 py-8 space-y-12 relative"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
             >
-                <div className="flex items-center gap-2 text-primary mb-2">
-                    <GitBranch className="w-4 h-4" />
-                    <span className="font-bold">LIVE_ROADMAP_FEED</span>
-                </div>
-                <div className="space-y-1 opacity-70">
-                    <p>{'>'} Q3 2024: Beta launch initiated for select providers.</p>
-                    <p>{'>'} Q4 2024: Integration with major EMR systems [IN_PROGRESS].</p>
-                    <p className="animate-pulse">{'>'} CURRENT: Scaling websocket infrastructure for real-time chat.</p>
-                </div>
-            </motion.div>
+                {/* 1. PRODUCT IDENTITY BLOCK */}
+                <motion.div variants={itemVariants} className="space-y-2">
+                    <div className="text-xs font-mono text-muted tracking-widest mb-1">PRODUCT_NODE</div>
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
+                        Healiora
+                    </h1>
+                    <div className="flex flex-col gap-1 font-mono text-xs md:text-sm text-muted/80">
+                        <div className="flex items-center gap-4">
+                            <span className="w-20 opacity-50">DOMAIN:</span>
+                            <span className="text-foreground">HealthTech</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className="w-20 opacity-50">STATUS:</span>
+                            <span className="text-primary flex items-center gap-2">
+                                In Development
+                                <span className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-pulse" />
+                            </span>
+                        </div>
+                    </div>
+                </motion.div>
 
+                {/* 2. CURRENT STATE (VERY IMPORTANT) */}
+                <motion.div variants={itemVariants} className="relative">
+                    <div className="absolute -left-[49px] md:-left-[65px] top-0 w-3 h-3 bg-primary/20 border border-primary/50" />
+                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                        Current_State
+                    </h2>
+                    <ul className="space-y-3 font-mono text-sm text-muted">
+                        <li className="flex items-start gap-3">
+                            <span className="text-primary mt-1">→</span>
+                            <span className="text-foreground/90">Actively building the Healiora platform</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <span className="text-primary mt-1">→</span>
+                            <span className="text-foreground/90">Preparing for initial public launch</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <span className="text-primary mt-1">→</span>
+                            <span className="text-foreground/90">Iterating based on early validation</span>
+                        </li>
+                    </ul>
+                </motion.div>
+
+                {/* 3. INCUBATION */}
+                <motion.div variants={itemVariants}>
+                    <h2 className="text-xs font-bold text-muted tracking-widest mb-3 uppercase opacity-70">
+                        Incubation
+                    </h2>
+                    <div className="p-4 border border-primary/10 bg-primary/5 backdrop-blur-sm">
+                        <ul className="space-y-2 font-mono text-xs text-muted/80">
+                            <li>• Incubated under CU-TBI (Chandigarh University)</li>
+                            <li>• Supported through mentorship and guidance</li>
+                            <li>• Focused on building a viable healthcare MVP</li>
+                        </ul>
+                    </div>
+                </motion.div>
+
+                {/* 4. PRODUCT SCOPE */}
+                <motion.div variants={itemVariants}>
+                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                        Product_Scope
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 font-mono text-xs text-muted">
+                        <div className="flex items-center gap-2">
+                            <span className="w-1 h-1 bg-primary/40" /> Patient-side application
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1 h-1 bg-primary/40" /> Hospital / provider interface
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1 h-1 bg-primary/40" /> Secure backend systems
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1 h-1 bg-primary/40" /> Focus on clean workflows
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* 5. ROLE & RESPONSIBILITY */}
+                <motion.div variants={itemVariants} className="relative">
+                    <div className="absolute -left-[49px] md:-left-[65px] top-1 w-2 h-2 rounded-full bg-muted/20" />
+                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                        Role & Responsibility
+                    </h2>
+                    <ul className="space-y-2 font-mono text-xs text-muted/90">
+                        <li>• Co-founder and product-focused engineer</li>
+                        <li>• Responsible for product direction</li>
+                        <li>• Backend system design and APIs</li>
+                        <li>• Involved in application flows and UX decisions</li>
+                    </ul>
+                </motion.div>
+
+                {/* 6. WHAT'S NEXT */}
+                <motion.div variants={itemVariants}>
+                    <h2 className="text-xs font-bold text-foreground tracking-widest mb-4 uppercase border-b border-primary/10 pb-2 w-max text-primary/80">
+                        Next_Phase
+                    </h2>
+                    <ul className="space-y-2 font-mono text-xs text-muted italic opacity-70">
+                        <li>.. Completing core MVP flows</li>
+                        <li>.. Preparing for wider release</li>
+                        <li>.. Refining system stability and UX</li>
+                    </ul>
+                </motion.div>
+
+                {/* 7. STATUS FOOTER */}
+                <motion.div variants={itemVariants} className="pt-8 mt-4 border-t border-primary/10">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-muted tracking-wider uppercase">
+                        <div>
+                            NODE_STATE: <span className="text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">ACTIVE</span>
+                        </div>
+                        <div>
+                            LAUNCH_PHASE: UPCOMING
+                        </div>
+                    </div>
+                </motion.div>
+
+            </motion.div>
         </div>
     );
 }

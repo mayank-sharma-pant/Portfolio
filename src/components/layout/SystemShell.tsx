@@ -188,7 +188,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     <div className="mt-auto p-4 border-t border-border">
                         <ModuleButton
                             id="HEALIORA"
-                            label="PRI_NODE: HEALIORA"
+                            label="PRODUCT_NODE: HEALIORA"
                             icon={Activity}
                             active={activeModule === 'HEALIORA'}
                             onClick={() => mountModule('HEALIORA')}
