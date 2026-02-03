@@ -83,6 +83,7 @@ export default function SystemOverview() {
                         id="SYSTEM_ID"
                         title="SYSTEM_ID"
                         className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
+                        variant="cyber"
                     >
                         <div className="p-5 space-y-2.5 text-xs text-foreground/80 font-mono">
                             <div className="flex gap-4">
@@ -107,6 +108,7 @@ export default function SystemOverview() {
                         id="CAPABILITIES"
                         title="CAPABILITIES"
                         className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
+                        variant="hologram"
                     >
                         <div className="p-5">
                             <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
@@ -203,6 +205,7 @@ export default function SystemOverview() {
                         id="SYSTEM_SIGNALS"
                         title="SYSTEM_SIGNALS"
                         className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
+                        variant="matrix"
                     >
                         <div className="p-5 space-y-2 text-xs text-foreground/80 font-mono">
                             <div className="flex gap-3">

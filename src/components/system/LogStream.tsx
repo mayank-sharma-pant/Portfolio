@@ -5,6 +5,15 @@ import { useSystem } from '@/context/SystemContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseCommand, getPrompt } from '@/utils/command-parser';
 import { synth } from '@/utils/audio-engine';
+import TypewriterText from '@/components/ui/TypewriterText';
+
+interface LogEntry {
+    id: string;
+    message: string;
+    timestamp: string;
+    type: 'INFO' | 'ERROR' | 'WARNING' | 'SUCCESS' | 'SYSTEM';
+    isTyping?: boolean;
+}
 
 export default function LogStream() {
     const { logs, activeModule, mountModule, pushLog, clearLogs } = useSystem();
@@ -17,6 +26,19 @@ export default function LogStream() {
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [hasUserScrolled, setHasUserScrolled] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [enhancedLogs, setEnhancedLogs] = useState<LogEntry[]>([]);
+
+    // Sync enhanced logs with system logs
+    useEffect(() => {
+        setEnhancedLogs(prev => {
+            const newLogs = logs.map(log => {
+                const existing = prev.find(p => p.id === log.id);
+                if (existing) return existing;
+                return { ...log, isTyping: true };
+            });
+            return newLogs;
+        });
+    }, [logs]);
 
     // Detect if user has scrolled away from bottom
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -39,7 +61,15 @@ export default function LogStream() {
         if (isAtBottom || !hasUserScrolled) {
             bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [logs, isAtBottom, hasUserScrolled]);
+    }, [enhancedLogs, isAtBottom, hasUserScrolled]);
+
+    const handleTypingComplete = (logId: string) => {
+        setEnhancedLogs(prev =>
+            prev.map(log =>
+                log.id === logId ? { ...log, isTyping: false } : log
+            )
+        );
+    };
 
     const handleCommand = (command: string) => {
         if (!command.trim()) return;
@@ -121,7 +151,7 @@ export default function LogStream() {
             <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-1">
                     <AnimatePresence initial={false}>
-                        {logs.map((log) => (
+                        {enhancedLogs.map((log) => (
                             <motion.div
                                 key={log.id}
                                 initial={{ opacity: 0, x: -10 }}
@@ -135,7 +165,17 @@ export default function LogStream() {
                             >
                                 <span className="opacity-50">[{log.timestamp}]</span>
                                 <span>{'>'}</span>
-                                <span className="whitespace-pre-wrap">{log.message}</span>
+                                <div className="flex-1">
+                                    {log.isTyping ? (
+                                        <TypewriterText
+                                            text={log.message}
+                                            speed={30}
+                                            onComplete={() => handleTypingComplete(log.id)}
+                                        />
+                                    ) : (
+                                        <span className="whitespace-pre-wrap">{log.message}</span>
+                                    )}
+                                </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -143,16 +183,19 @@ export default function LogStream() {
                 </div>
             </div>
 
-            {/* Terminal Input */}
-            <div className="border-t border-primary/20 bg-black/60 p-3 flex items-center gap-2">
-                <span className="text-primary">{getPrompt(activeModule)}</span>
+            {/* Enhanced Terminal Input */}
+            <div className="border-t border-primary/20 bg-black/60 p-3 flex items-center gap-2 relative overflow-hidden">
+                {/* Subtle input glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
+
+                <span className="text-primary relative z-10">{getPrompt(activeModule)}</span>
                 <input
                     ref={inputRef}
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 bg-transparent outline-none text-foreground caret-primary"
+                    className="flex-1 bg-transparent outline-none text-foreground caret-primary relative z-10"
                     placeholder="Type 'help' for commands..."
                     autoComplete="off"
                     spellCheck={false}
@@ -160,8 +203,11 @@ export default function LogStream() {
                 <motion.span
                     animate={{ opacity: [1, 0, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
-                    className="w-2 h-4 bg-primary/50"
+                    className="w-2 h-4 bg-primary/50 relative z-10"
                 />
+
+                {/* Data flow effect */}
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
             </div>
         </div>
     );

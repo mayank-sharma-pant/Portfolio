@@ -105,11 +105,57 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         transition={{ duration: 1 }}
                         className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8"
                     >
-                        <Lock className="w-16 h-16 text-primary mb-8 animate-pulse" />
-                        <div className="text-primary font-mono text-xl tracking-[0.5em] mb-4">SYSTEM BOOT SEQUENCE</div>
-                        <div className="w-full max-w-md">
-                            <LogStream />
+                        {/* Enhanced Boot Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-cyan-500/10 animate-pulse" />
+                        <div className="absolute inset-0">
+                            {[...Array(20)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute w-1 h-1 bg-primary/30 animate-ping"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        animationDelay: `${Math.random() * 2}s`,
+                                        animationDuration: `${2 + Math.random() * 2}s`
+                                    }}
+                                />
+                            ))}
                         </div>
+
+                        <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.8, ease: 'backOut' }}
+                            className="relative z-10"
+                        >
+                            <Lock className="w-16 h-16 text-primary mb-8 animate-pulse-glow drop-shadow-[0_0_20px_rgba(63,185,224,0.8)]" />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="text-primary font-mono text-xl tracking-[0.5em] mb-4 relative z-10"
+                        >
+                            SYSTEM BOOT SEQUENCE
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="w-full max-w-md relative z-10"
+                        >
+                            <LogStream />
+                        </motion.div>
+
+                        {/* Boot Progress Indicator */}
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 2, delay: 0.8, ease: 'easeInOut' }}
+                            className="absolute bottom-8 left-8 right-8 h-0.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50 rounded-full"
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>
