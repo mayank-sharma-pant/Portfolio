@@ -510,6 +510,24 @@ body {
   opacity: 0.5;
 }
 
+@keyframes runnerTrack {
+  0% { transform: translateX(-40%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(140%); opacity: 0; }
+}
+
+.anime-runner-track {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: 80px;
+}
+
+.anime-runner-track .anime-runner {
+  animation: runnerBob 0.4s ease-in-out infinite, runnerTrack 2.6s linear infinite;
+}
+
 @keyframes stickerPop {
   0% { transform: scale(0.9) rotate(-2deg); opacity: 0; }
   100% { transform: scale(1) rotate(-2deg); opacity: 1; }
@@ -537,6 +555,65 @@ body {
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+@keyframes guideBlink {
+  0%, 90%, 100% { opacity: 1; }
+  92%, 96% { opacity: 0.3; }
+}
+
+@keyframes guidePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.anime-guide {
+  position: absolute;
+  right: 24px;
+  top: -28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+}
+
+.anime-guide .avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  display: grid;
+  place-items: center;
+  animation: animeFloat 2.4s ease-in-out infinite, guidePulse 3s ease-in-out infinite;
+}
+
+.anime-guide .avatar span {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: guideBlink 3.8s ease-in-out infinite;
+}
+
+.anime-guide .bubble {
+  border: 1px solid var(--border);
+  background: var(--background);
+  padding: 6px 10px;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.anime-guide .pointer {
+  position: absolute;
+  right: 60px;
+  top: 34px;
+  width: 80px;
+  height: 2px;
+  background: var(--primary);
+  opacity: 0.6;
 }
 
 ::-webkit-scrollbar { width: 8px; }

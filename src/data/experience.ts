@@ -9,7 +9,7 @@ export interface LogEntry {
 
 export const experience: LogEntry[] = [
     {
-        id: "LOG_2024_HEALIORA",
+        id: "LOG_2025_HEALIORA",
         role: "Co-founder & Product-Focused Engineer",
         company: "Healiora (CU-TBI Incubated)",
         period: "Mar 2024 – Present",
@@ -22,7 +22,7 @@ export const experience: LogEntry[] = [
         ]
     },
     {
-        id: "LOG_2024_SUNEDGE",
+        id: "LOG_2025_SUNEDGE",
         role: "Backend Developer Intern",
         company: "SunEdge IT Solutions",
         period: "Dec 2024 – Present",

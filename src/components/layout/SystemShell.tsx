@@ -139,7 +139,17 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                             SYSTEM BOOT SEQUENCE
                         </motion.div>
 
-                        <div className="text-primary/80 flex flex-col items-center gap-3 relative z-10">
+                        <div className="text-primary/80 flex flex-col items-center gap-3 relative z-10 w-full max-w-md">
+                            <div className="anime-runner-track text-primary/80">
+                                <div className="anime-runner">
+                                    <span className="trail" />
+                                    <span className="head" />
+                                    <span className="band" />
+                                    <span className="body" />
+                                    <span className="arm" />
+                                    <span className="leg" />
+                                </div>
+                            </div>
                             <div className="text-[11px] tracking-[0.45em] uppercase text-muted">
                                 Running checks...
                             </div>

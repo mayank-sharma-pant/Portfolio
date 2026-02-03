@@ -7,7 +7,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export default function SystemOverview() {
-    const { logs } = useSystem();
+    const { logs, state } = useSystem();
     const containerRef = useRef<HTMLDivElement>(null);
     const terminalGlowRef = useRef<HTMLDivElement>(null);
 
@@ -99,16 +99,25 @@ export default function SystemOverview() {
             </section>
 
             {/* Terminal Panel */}
-            <section className="relative border border-border bg-secondary px-6 py-6" data-panel>
-                <div className="absolute inset-0 pointer-events-none" ref={terminalGlowRef}>
-                    <div className="absolute inset-0 bg-primary/10" />
-                </div>
-                <div className="text-[11px] uppercase tracking-[0.6em] text-muted mb-3">System Brain</div>
-                <div className="relative">
-                    <LogStream label="System Activity" />
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[repeating-linear-gradient(180deg,transparent_0,transparent_2px,rgba(255,255,255,0.08)_2px,rgba(255,255,255,0.08)_3px)]" />
-                </div>
-            </section>
+            {state !== 'BOOT' && (
+                <section className="relative border border-border bg-secondary px-6 py-6" data-panel>
+                    <div className="absolute inset-0 pointer-events-none" ref={terminalGlowRef}>
+                        <div className="absolute inset-0 bg-primary/10" />
+                    </div>
+                    <div className="anime-guide text-primary/80">
+                        <div className="avatar">
+                            <span />
+                        </div>
+                        <div className="bubble">Try typing help</div>
+                        <div className="pointer" />
+                    </div>
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted mb-3">System Brain</div>
+                    <div className="relative">
+                        <LogStream label="System Activity" />
+                        <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[repeating-linear-gradient(180deg,transparent_0,transparent_2px,rgba(255,255,255,0.08)_2px,rgba(255,255,255,0.08)_3px)]" />
+                    </div>
+                </section>
+            )}
 
             {/* Project Panel */}
             <section className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12" data-panel>

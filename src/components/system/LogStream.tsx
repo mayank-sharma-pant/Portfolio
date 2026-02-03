@@ -168,7 +168,7 @@ export default function LogStream({
         : 'h-48 w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col';
 
     return (
-        <div className={containerClassName}>
+        <div className={`${containerClassName} relative`}>
             {label && (
                 <div className="px-6 pt-4 pb-2 text-[11px] uppercase tracking-[0.25em] text-muted font-sans">
                     {label}
