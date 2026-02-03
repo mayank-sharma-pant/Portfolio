@@ -1,297 +1,154 @@
-'use client';
+﻿'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
 import { useSystem } from '@/context/SystemContext';
-import { synth } from '@/utils/audio-engine';
-import SystemPanel from '@/components/ui/SystemPanel';
-import SoundToggle from '@/components/ui/SoundToggle';
-import GlitchText from '@/components/ui/GlitchText';
+import LogStream from '@/components/system/LogStream';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export default function SystemOverview() {
-    const { pushLog } = useSystem();
-    const [mounted, setMounted] = useState(false);
-    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-    const [lightSweepComplete, setLightSweepComplete] = useState(false);
+    const { logs } = useSystem();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const terminalGlowRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setMounted(true);
-        // Light sweep animation (wow moment)
-        const timer = setTimeout(() => {
-            setLightSweepComplete(true);
-        }, 2000);
-        return () => clearTimeout(timer);
+        gsap.registerPlugin(ScrollTrigger);
+
+        const ctx = gsap.context(() => {
+            const introPanels = gsap.utils.toArray<HTMLElement>('[data-panel-intro]');
+            const panels = gsap.utils.toArray<HTMLElement>('[data-panel]');
+
+            gsap.set(introPanels, { y: 40, opacity: 0 });
+            gsap.set(panels, { y: 40, opacity: 0 });
+
+            const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
+            tl.to(introPanels, { y: 0, opacity: 1, duration: 0.8, stagger: 0.15 })
+              .to('[data-title]', { y: 0, opacity: 1, duration: 0.6 }, '-=0.3');
+
+            gsap.utils.toArray<HTMLElement>('[data-panel]').forEach((panel) => {
+                gsap.to(panel, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.7,
+                    ease: 'power2.inOut',
+                    scrollTrigger: {
+                        trigger: panel,
+                        start: 'top 85%'
+                    }
+                });
+            });
+        }, containerRef);
+
+        return () => ctx.revert();
     }, []);
 
-    const handleCardHover = (cardName: string) => {
-        if (hoveredCard !== cardName) {
-            synth.playHover();
-            pushLog(`Inspecting ${cardName}`, 'SYSTEM');
-            setHoveredCard(cardName);
-        }
-    };
-
-    const handleCardLeave = () => {
-        setHoveredCard(null);
-    };
-
-    // Weighted stagger delays for sections
-    const sectionVariants = {
-        hidden: { opacity: 0, y: 15, scale: 0.98 },
-        visible: (delay: number) => ({
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            transition: {
-                duration: 0.6,
-                delay: delay + 0.02,
-                ease: [0.4, 0, 0.2, 1]
-            }
-        })
-    };
+    useEffect(() => {
+        if (!terminalGlowRef.current) return;
+        if (logs.length === 0) return;
+        gsap.fromTo(
+            terminalGlowRef.current,
+            { opacity: 0 },
+            { opacity: 0.35, duration: 0.2, ease: 'power2.inOut', yoyo: true, repeat: 1 }
+        );
+    }, [logs.length]);
 
     return (
-        <div className="h-full w-full flex items-center justify-center p-6 sm:p-12 overflow-y-auto relative">
-            {/* Light Sweep - Wow Moment */}
-            {!lightSweepComplete && (
-                <motion.div
-                    className="absolute inset-0 pointer-events-none z-50"
-                    initial={{ x: '-100%' }}
-                    animate={{ x: '100%' }}
-                    transition={{ duration: 2, ease: 'linear' }}
+        <div ref={containerRef} className="relative space-y-12">
+            {/* Intro Panel */}
+            <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+                <div
+                    className="relative border border-border bg-secondary px-10 py-12 lg:px-14 lg:py-16"
+                    data-panel-intro
                 >
-                    <div className="h-full w-[200px] bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-xl" />
-                </motion.div>
-            )}
-
-            <SoundToggle />
-
-            <div className="max-w-5xl w-full space-y-8 font-mono text-sm">
-
-                {/* Page Title */}
-                <div className="border-b border-primary/20 pb-6 mb-8">
-                    <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                        <span className="text-primary">{'>'}</span>
-                        <GlitchText text="SYSTEM_OVERVIEW" reveal={true} />
+                    <div className="absolute -inset-2 border border-border/60 pointer-events-none" />
+                    <div className="absolute -inset-6 border border-border/30 pointer-events-none" />
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Dark Cinematic Systems</div>
+                    <h1 className="mt-6 text-6xl md:text-7xl font-semibold tracking-tight text-foreground" data-title>
+                        Mayank Sharma
                     </h1>
+                    <p className="mt-4 text-lg md:text-xl text-foreground/85 max-w-xl">
+                        Backend-focused intern and early-stage founder building systems that feel calm, reliable, and real.
+                    </p>
+                    <div className="mt-8 h-px bg-border" />
+                    <div className="mt-4 text-xs uppercase tracking-[0.35em] text-muted">
+                        Backend • Product Systems • HealthTech
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-
-                    {/* SYSTEM_ID Card */}
-                    <SystemPanel
-                        id="SYSTEM_ID"
-                        title="SYSTEM_ID"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                        variant="cyber"
-                    >
-                        <div className="p-5 space-y-2.5 text-xs text-foreground/80 font-mono">
-                            <div className="flex gap-4">
-                                <span className="text-muted w-20">NAME:</span>
-                                <span className="text-foreground font-bold">Mayank Sharma</span>
-                            </div>
-                            <div className="flex gap-4">
-                                <span className="text-muted w-20">TYPE:</span>
-                                <span className="text-primary/90">Backend Engineer</span>
-                            </div>
-                            <div className="flex gap-4">
-                                <span className="text-muted w-20">STATE:</span>
-                                <span className="text-green-500 flex items-center gap-2">
-                                    ACTIVE <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                                </span>
+                <div className="relative border border-border bg-background px-8 py-10 lg:px-10" data-panel-intro>
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">System Status</div>
+                    <div className="mt-6 space-y-5 text-base text-foreground/90">
+                        <div>
+                            <div className="text-muted text-sm mb-1">Current Focus</div>
+                            <div>Backend Developer Intern — SunEdge IT Solutions</div>
+                        </div>
+                        <div>
+                            <div className="text-muted text-sm mb-1">Active Build</div>
+                            <div>Healiora — product & backend systems</div>
+                        </div>
+                        <div>
+                            <div className="text-muted text-sm mb-1">Status</div>
+                            <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.3em]">
+                                <span className="border border-border px-2 py-1">ACTIVE</span>
+                                <span className="border border-border px-2 py-1">IN_PROGRESS</span>
+                                <span className="border border-border px-2 py-1">BUILDING</span>
                             </div>
                         </div>
-                    </SystemPanel>
-
-                    {/* CAPABILITIES Card */}
-                    <SystemPanel
-                        id="CAPABILITIES"
-                        title="CAPABILITIES"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                        variant="hologram"
-                    >
-                        <div className="p-5">
-                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Design and build REST APIs</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Implement clean backend architecture</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Develop Android applications</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Ship MVPs with real users</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </SystemPanel>
-
-                    {/* CURRENT_ROLE Card */}
-                    <SystemPanel
-                        id="CURRENT_ROLE"
-                        title="CURRENT_ROLE"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                    >
-                        <div className="p-5">
-                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">›</span>
-                                    <span>Backend Developer Intern — Enterprise APIs</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">›</span>
-                                    <span>Product-Focused Engineer — Healiora MVP</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </SystemPanel>
-
-                    {/* EXECUTION_CONTEXT Card */}
-                    <SystemPanel
-                        id="EXECUTION_CONTEXT"
-                        title="EXECUTION_CONTEXT"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                    >
-                        <div className="p-5">
-                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Backend Intern — SunEdge IT Solutions</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>Co-founder — Healiora (CU-TBI Incubated)</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">•</span>
-                                    <span>B.Tech CSE — Chandigarh University</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </SystemPanel>
-
-                    {/* SYSTEM_FOCUS Card */}
-                    <SystemPanel
-                        id="SYSTEM_FOCUS"
-                        title="SYSTEM_FOCUS"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                    >
-                        <div className="p-5">
-                            <ul className="space-y-1.5 text-xs text-foreground/80 font-mono">
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">›</span>
-                                    <span>Backend APIs & clean architecture</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">›</span>
-                                    <span>Real-world product development</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-primary/50 mt-0.5">›</span>
-                                    <span>Frontend fundamentals & interaction systems</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </SystemPanel>
-
-                    {/* SYSTEM_SIGNALS Card */}
-                    <SystemPanel
-                        id="SYSTEM_SIGNALS"
-                        title="SYSTEM_SIGNALS"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                        variant="matrix"
-                    >
-                        <div className="p-5 space-y-2 text-xs text-foreground/80 font-mono">
-                            <div className="flex gap-3">
-                                <span className="text-muted w-28">ACTIVE_MODULES:</span>
-                                <span>Projects, Dependencies, Sys Logs</span>
-                            </div>
-                            <div className="flex gap-3">
-                                <span className="text-muted w-28">PRIMARY_STACK:</span>
-                                <span className="text-primary/90">Java / Spring Boot / SQL</span>
-                            </div>
-                            <div className="flex gap-3">
-                                <span className="text-muted w-28">CURRENT_PHASE:</span>
-                                <span>Skill Expansion (Frontend)</span>
-                            </div>
-                        </div>
-                    </SystemPanel>
-
-                    {/* EXTERNAL_INTERFACES Card */}
-                    <SystemPanel
-                        id="EXTERNAL_INTERFACES"
-                        title="EXTERNAL_INTERFACES"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                    >
-                        <div className="p-5 space-y-1.5 text-xs text-foreground/80 font-mono">
-                            <a
-                                href="https://github.com/mayank-sharma-pant"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group relative"
-                            >
-                                <span className="text-muted w-20">GITHUB</span>
-                                <span className="relative">
-                                    → github.com/mayank-sharma-pant
-                                    <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
-                                </span>
-                            </a>
-                            <a
-                                href="https://linkedin.com/in/mayank-sharma-a747ba275/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group relative"
-                            >
-                                <span className="text-muted w-20">LINKEDIN</span>
-                                <span className="relative">→ linkedin.com/in/mayank-sharma-a747ba275/</span>
-                            </a>
-                            <a
-                                href="https://x.com/nullbytez"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex gap-3 hover:text-primary transition-colors group relative"
-                            >
-                                <span className="text-muted w-20">X</span>
-                                <span className="relative">→ x.com/nullbytez</span>
-                            </a>
-                            <a
-                                href="mailto:mayanksharmarrk01@gmail.com"
-                                className="flex gap-3 hover:text-primary transition-colors group relative"
-                            >
-                                <span className="text-muted w-20">EMAIL</span>
-                                <span className="relative">→ mayanksharmarrk01@gmail.com</span>
-                            </a>
-                        </div>
-                    </SystemPanel>
-
-                    {/* SYSTEM_STATUS Card */}
-                    <SystemPanel
-                        id="SYSTEM_STATUS"
-                        title="SYSTEM_STATUS"
-                        className="p-0 overflow-hidden backdrop-blur-sm bg-black/40"
-                    >
-                        <div className="p-5 grid grid-cols-2 gap-4 text-xs font-mono">
-                            <div>
-                                <span className="text-muted block mb-1">MODE</span>
-                                <span className="text-foreground tracking-wider">LEARNING + BUILDING</span>
-                            </div>
-                            <div>
-                                <span className="text-muted block mb-1">LAST_ACTIVITY</span>
-                                <span className="text-primary/90">Active modules running</span>
-                            </div>
-                        </div>
-                    </SystemPanel>
-
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            {/* Terminal Panel */}
+            <section className="relative border border-border bg-secondary px-6 py-6" data-panel>
+                <div className="absolute inset-0 pointer-events-none" ref={terminalGlowRef}>
+                    <div className="absolute inset-0 bg-primary/10" />
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.6em] text-muted mb-3">System Brain</div>
+                <div className="relative">
+                    <LogStream label="System Activity" />
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[repeating-linear-gradient(180deg,transparent_0,transparent_2px,rgba(255,255,255,0.08)_2px,rgba(255,255,255,0.08)_3px)]" />
+                </div>
+            </section>
+
+            {/* Project Panel */}
+            <section className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-12" data-panel>
+                <div className="relative border border-border bg-background px-8 py-10">
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Project Module</div>
+                    <h2 className="mt-5 text-3xl font-semibold text-foreground">Healiora</h2>
+                    <p className="mt-4 text-base text-foreground/85">
+                        A HealthTech platform focused on patient and hospital workflows. I lead the product direction and backend architecture.
+                    </p>
+                    <div className="mt-6 text-xs uppercase tracking-[0.3em] text-muted">In development • CU-TBI incubated</div>
+                </div>
+                <div className="relative border border-border bg-secondary px-8 py-10">
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Current Scope</div>
+                    <ul className="mt-5 space-y-2 text-base text-foreground/90">
+                        <li>API design with clear boundaries</li>
+                        <li>Data modeling and system reliability</li>
+                        <li>Product workflows that feel intuitive</li>
+                        <li>Iteration based on real user feedback</li>
+                    </ul>
+                </div>
+            </section>
+
+            {/* Closing Panel */}
+            <section className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12" data-panel>
+                <div className="relative border border-border bg-background px-8 py-10">
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Closing Panel</div>
+                    <p className="mt-5 text-base text-foreground/85">
+                        I build calm, durable systems and ship products that are grounded in reality — not hype.
+                    </p>
+                </div>
+                <div className="relative border border-border bg-secondary px-8 py-10">
+                    <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Contact</div>
+                    <div className="mt-5 space-y-2 text-base text-foreground/90">
+                        <div>github.com/mayank-sharma-pant</div>
+                        <div>linkedin.com/in/mayank-sharma-a747ba275/</div>
+                        <div>x.com/nullbytez</div>
+                        <div>mayanksharmarrk01@gmail.com</div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }
-
-

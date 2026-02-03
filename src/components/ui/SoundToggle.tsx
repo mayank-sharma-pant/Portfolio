@@ -28,11 +28,10 @@ export default function SoundToggle() {
             onClick={toggleSound}
             className={`
                 fixed top-6 right-6 z-50 p-3 
-                rounded-full border backdrop-blur-md transition-all duration-300
-                hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]
+                rounded-full border transition-colors duration-200
                 ${isMuted
-                    ? 'bg-slate-900/50 border-slate-700 text-slate-500 hover:text-slate-300'
-                    : 'bg-cyan-950/30 border-cyan-500/50 text-cyan-400 hover:text-cyan-200 shadow-[0_0_10px_rgba(6,182,212,0.2)]'
+                    ? 'bg-transparent border-border text-muted hover:text-foreground'
+                    : 'bg-secondary border-border text-foreground hover:text-primary'
                 }
             `}
             aria-label={isMuted ? "Unmute system audio" : "Mute system audio"}

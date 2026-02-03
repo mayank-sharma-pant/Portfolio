@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useSystem } from '@/context/SystemContext';
@@ -15,7 +15,15 @@ interface LogEntry {
     isTyping?: boolean;
 }
 
-export default function LogStream() {
+type LogStreamVariant = 'default' | 'light';
+
+export default function LogStream({
+    variant = 'default',
+    label
+}: {
+    variant?: LogStreamVariant;
+    label?: string;
+}) {
     const { logs, activeModule, mountModule, pushLog, clearLogs } = useSystem();
     const bottomRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +35,7 @@ export default function LogStream() {
     const [hasUserScrolled, setHasUserScrolled] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [enhancedLogs, setEnhancedLogs] = useState<LogEntry[]>([]);
+    const [pulse, setPulse] = useState(false);
 
     // Sync enhanced logs with system logs
     useEffect(() => {
@@ -39,6 +48,14 @@ export default function LogStream() {
             return newLogs;
         });
     }, [logs]);
+
+    // Pulse on new logs
+    useEffect(() => {
+        if (logs.length === 0) return;
+        setPulse(true);
+        const timer = setTimeout(() => setPulse(false), 300);
+        return () => clearTimeout(timer);
+    }, [logs.length]);
 
     // Detect if user has scrolled away from bottom
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -56,10 +73,11 @@ export default function LogStream() {
         }
     };
 
-    // Conditional auto-scroll - only when user is at bottom or hasn't scrolled yet
+    // Conditional auto-scroll - only within terminal container (avoid page scroll)
     useEffect(() => {
+        if (!scrollContainerRef.current) return;
         if (isAtBottom || !hasUserScrolled) {
-            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
         }
     }, [enhancedLogs, isAtBottom, hasUserScrolled]);
 
@@ -145,10 +163,31 @@ export default function LogStream() {
         }
     };
 
+    const containerClassName = variant === 'light'
+        ? 'h-48 w-full border-t border-border bg-transparent font-mono text-xs overflow-hidden font-medium flex flex-col'
+        : 'h-48 w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col';
+
     return (
-        <div className="h-48 w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col">
+        <div className={containerClassName}>
+            {label && (
+                <div className="px-6 pt-4 pb-2 text-[11px] uppercase tracking-[0.25em] text-muted font-sans">
+                    {label}
+                </div>
+            )}
+            {/* Pulse bar synced to logs */}
+            <AnimatePresence>
+                {pulse && (
+                    <motion.div
+                        initial={{ scaleX: 0, opacity: 0 }}
+                        animate={{ scaleX: 1, opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.35, ease: 'easeOut' }}
+                        className="h-px bg-primary"
+                    />
+                )}
+            </AnimatePresence>
             {/* Log Output */}
-            <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4">
+            <div ref={scrollContainerRef} onScroll={handleScroll} className={`flex-1 overflow-y-auto ${label ? 'px-6 pb-4' : 'p-4'}`}>
                 <div className="space-y-1">
                     <AnimatePresence initial={false}>
                         {enhancedLogs.map((log) => (
@@ -184,9 +223,11 @@ export default function LogStream() {
             </div>
 
             {/* Enhanced Terminal Input */}
-            <div className="border-t border-primary/20 bg-black/60 p-3 flex items-center gap-2 relative overflow-hidden">
+            <div className={`border-t border-primary/20 p-3 flex items-center gap-2 relative overflow-hidden ${variant === 'light' ? 'bg-transparent' : 'bg-black/60'}`}>
                 {/* Subtle input glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
+                {variant !== 'light' && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
+                )}
 
                 <span className="text-primary relative z-10">{getPrompt(activeModule)}</span>
                 <input
@@ -207,7 +248,9 @@ export default function LogStream() {
                 />
 
                 {/* Data flow effect */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
+                {variant !== 'light' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
+                )}
             </div>
         </div>
     );

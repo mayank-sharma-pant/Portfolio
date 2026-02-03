@@ -4,9 +4,6 @@ export interface Project {
     type: string;
     status: 'ACTIVE' | 'IN_PROGRESS' | 'COMPLETED';
     context: string;
-    stack: string; // Changed from array to string as per user request (e.g., "FastAPI, Android...") or we can keep it array if UI prefers. User provided "STACK: ..." string format. Let's stick to string for "STACK" display but maybe array is better for badges? User request shows "STACK: Value". I will use string for strict adherence or array for flexibility. Let's use string to match "STACK: ..." line exactness, or array for badges. The user said "Projects render progressively... PROJECT_NODE... STACK: ...". I will use string to minimize transformation if they want that exact text. Actually, let's keep it as an array for the 'tech' prop if we want badges, OR just a context string. 
-    // User input: "STACK: FastAPI, Android, Backend Systems". 
-    // Let's use a string to be safe and simple.
     tech: string;
     focus: string[];
     description: string;

@@ -1,20 +1,18 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '@/data/projects';
 import { useSystem } from '@/context/SystemContext';
 import { synth } from '@/utils/audio-engine';
-import { ChevronRight, ChevronDown, Activity, Terminal } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import StaggerContainer, { StaggerItem } from '@/components/ui/StaggerContainer';
-import GlitchText from '@/components/ui/GlitchText';
 
 export default function ProjectsView() {
     const { pushLog } = useSystem();
     const [expandedProject, setExpandedProject] = useState<string | null>(null);
     const [hoveredProject, setHoveredProject] = useState<string | null>(null);
 
-    // Initial load logs
     useEffect(() => {
         const timer1 = setTimeout(() => pushLog('> Loading PROJECT_REGISTRY', 'SYSTEM'), 100);
         const timer2 = setTimeout(() => pushLog('> Resolving active and completed nodes', 'SYSTEM'), 600);
@@ -33,135 +31,101 @@ export default function ProjectsView() {
     };
 
     const handleProjectClick = (projectId: string, projectName: string) => {
-        if (expandedProject === projectId) return; // Already open
-
+        if (expandedProject === projectId) return;
         synth.playClick();
         pushLog(`Opening project node: ${projectName}`, 'SYSTEM');
         setExpandedProject(projectId);
     };
 
     return (
-        <div className="space-y-8 pb-12">
-            {/* Header */}
-            <div className="border-b border-primary/20 pb-6">
-                <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                    <span className="text-primary">{'>'}</span>
-                    <GlitchText text="PROJECT_REGISTRY" reveal={true} />
-                </h1>
-                <div className="mt-2 flex items-center gap-4 text-xs font-mono text-muted">
+        <div className="space-y-10 pb-12">
+            <section className="relative border border-border bg-secondary px-8 py-8">
+                <div className="absolute -inset-2 border border-border/40 pointer-events-none" />
+                <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Project Registry</div>
+                <h1 className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Projects</h1>
+                <div className="mt-4 text-xs font-mono text-muted flex items-center gap-4">
                     <span>TOTAL_NODES: {projects.length}</span>
-                    <span className="text-primary flex items-center gap-2">
-                        <span className="animate-pulse w-1.5 h-1.5 bg-primary rounded-full" />
-                        SYSTEM_ACTIVE
-                    </span>
+                    <span className="text-primary">SYSTEM_ACTIVE</span>
                 </div>
-            </div>
+            </section>
 
-            {/* Project Nodes List */}
-            <StaggerContainer className="space-y-4">
-                {projects.map((project, index) => {
-                    const isExpanded = expandedProject === project.id;
-                    const isHealiora = project.name === 'Healiora';
-
-                    return (
-                        <StaggerItem
-                            key={project.id}
-                            className={`
-                                group relative overflow-hidden transition-all duration-300
-                                border ${isExpanded ? 'border-primary/60 bg-primary/5' : 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/5'}
-                                ${isHealiora ? 'border-l-4 border-l-primary' : ''}
-                            `}
-                        >
-                            <div
-                                onMouseEnter={() => handleProjectHover(project.id, project.name)}
-                                onClick={() => handleProjectClick(project.id, project.name)}
+            <section className="relative border border-border bg-background px-6 py-6">
+                <div className="absolute -inset-2 border border-border/30 pointer-events-none" />
+                <StaggerContainer className="space-y-4">
+                    {projects.map((project) => {
+                        const isExpanded = expandedProject === project.id;
+                        return (
+                            <StaggerItem
+                                key={project.id}
+                                className={`border border-border/60 bg-secondary/40 transition-colors ${isExpanded ? 'border-primary/60' : 'hover:border-border'}`}
                             >
-                                {/* Node Header (Always Visible) */}
-                                <div className="p-4 sm:p-5 flex flex-col md:flex-row gap-4 md:items-center justify-between cursor-pointer">
-
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-3">
-                                            <span className={`text-xs font-mono ${isExpanded ? 'text-primary' : 'text-muted'}`}>
-                                                {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                                            </span>
-                                            <h3 className={`font-bold tracking-wide text-lg ${isHealiora ? 'text-white' : 'text-foreground'}`}>
-                                                {project.name}
-                                            </h3>
-                                            {project.status === 'ACTIVE' && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 animate-pulse">
-                                                    LIVE
+                                <div
+                                    onMouseEnter={() => handleProjectHover(project.id, project.name)}
+                                    onClick={() => handleProjectClick(project.id, project.name)}
+                                >
+                                    <div className="p-5 flex flex-col md:flex-row gap-4 md:items-center justify-between cursor-pointer">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-3">
+                                                <span className={`text-xs font-mono ${isExpanded ? 'text-primary' : 'text-muted'}`}>
+                                                    {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                                                 </span>
-                                            )}
-                                        </div>
-                                        <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs font-mono text-muted pl-7">
-                                            <span className="flex items-center gap-2">
-                                                <span className="w-1 h-1 bg-primary/50 rounded-full" />
-                                                {project.type}
-                                            </span>
-                                            <span className="flex items-center gap-2">
-                                                <span className="w-1 h-1 bg-primary/50 rounded-full" />
-                                                {project.context}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="pl-7 md:pl-0 md:text-right text-xs font-mono text-primary/80">
-                                        {project.status}
-                                    </div>
-                                </div>
-
-                                {/* Node Details (Expandable) */}
-                                <AnimatePresence>
-                                    {isExpanded && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="overflow-hidden bg-black/20"
-                                        >
-                                            <div className="p-5 pt-0 pl-11 space-y-6 text-sm">
-
-                                                {/* Stack */}
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-mono text-muted uppercase tracking-wider">Tech Stack</div>
-                                                    <div className="font-mono text-primary/90">{project.tech}</div>
-                                                </div>
-
-                                                {/* Focus Points */}
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-mono text-muted uppercase tracking-wider">Engineering Focus</div>
-                                                    <ul className="space-y-1">
-                                                        {project.focus.map((point, i) => (
-                                                            <li key={i} className="flex items-start gap-2 text-foreground/80">
-                                                                <span className="mt-1.5 w-1 h-1 bg-primary rounded-full" />
-                                                                {point}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-
-                                                {/* Description */}
-                                                <div className="space-y-2">
-                                                    <div className="text-xs font-mono text-muted uppercase tracking-wider">Context</div>
-                                                    <p className="text-muted leading-relaxed max-w-3xl">
-                                                        {project.description}
-                                                    </p>
-                                                </div>
-
+                                                <h3 className="text-lg font-semibold text-foreground">{project.name}</h3>
+                                                {project.status === 'ACTIVE' && (
+                                                    <span className="px-2 py-0.5 rounded-full text-[10px] border border-primary/40 text-primary">
+                                                        LIVE
+                                                    </span>
+                                                )}
                                             </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </StaggerItem>
-                    );
-                })}
-            </StaggerContainer>
+                                            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs font-mono text-muted pl-7">
+                                                <span>{project.type}</span>
+                                                <span>{project.context}</span>
+                                            </div>
+                                        </div>
+                                        <div className="pl-7 md:pl-0 md:text-right text-xs font-mono text-muted">
+                                            {project.status}
+                                        </div>
+                                    </div>
 
-            {/* Footer Status */}
-            <div className="mt-8 text-[10px] font-mono text-muted/40 text-right border-t border-white/5 pt-4">
-                SYSTEM_REGISTRY_V1.0 // ALL_NODES_LOADED
-            </div>
+                                    <AnimatePresence>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="p-5 pt-0 pl-11 space-y-6 text-sm">
+                                                    <div className="space-y-2">
+                                                        <div className="text-xs font-mono text-muted uppercase tracking-wider">Tech Stack</div>
+                                                        <div className="font-mono text-primary/90">{project.tech}</div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <div className="text-xs font-mono text-muted uppercase tracking-wider">Engineering Focus</div>
+                                                        <ul className="space-y-1">
+                                                            {project.focus.map((point, i) => (
+                                                                <li key={i} className="flex items-start gap-2 text-foreground/80">
+                                                                    <span className="mt-1.5 w-1 h-1 bg-primary rounded-full" />
+                                                                    {point}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <div className="text-xs font-mono text-muted uppercase tracking-wider">Context</div>
+                                                        <p className="text-muted leading-relaxed max-w-3xl">
+                                                            {project.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            </StaggerItem>
+                        );
+                    })}
+                </StaggerContainer>
+            </section>
         </div>
     );
 }

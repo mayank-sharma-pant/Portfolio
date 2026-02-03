@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -14,7 +14,8 @@ import SystemCommandsView from '@/components/modules/SystemCommandsView';
 import AccessView from '@/components/modules/AccessView';
 
 import { synth } from '@/utils/audio-engine';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 // Sub-components for cleanliness
 const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
@@ -34,7 +35,7 @@ const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
     >
         <Icon className={`w-5 h-5 transition-transform duration-200 ${active ? 'animate-pulse' : 'group-hover:scale-110'
             }`} />
-        <span className="font-mono text-sm tracking-wider relative">
+        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
             {label}
             {/* Underline grow on hover */}
             <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
@@ -52,7 +53,10 @@ const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
 
 export default function SystemShell({ children }: { children: React.ReactNode }) {
     const { state, activeModule, mountModule, bootSystem } = useSystem();
-    const router = useRouter();
+    const pathname = usePathname();
+    const isHomeView = pathname === '/' && !activeModule;
+    const isProjectsRoute = pathname === '/projects';
+    const isExperienceRoute = pathname === '/experience';
 
     const handleSystemReset = () => {
         synth.playClick();
@@ -65,6 +69,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     useEffect(() => {
         bootSystem();
     }, [bootSystem]);
+
 
     // Central Router Logic
     const renderActiveModule = () => {
@@ -89,13 +94,17 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     };
 
     return (
-        <div className="min-h-screen w-full bg-background text-foreground font-mono selection:bg-primary selection:text-background overflow-hidden relative flex flex-col">
+        <div className={`min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-background overflow-hidden relative flex flex-col ${isHomeView ? 'theme-home' : 'font-mono'}`}>
 
-            {/* Animated Mesh Background - Desaturated & Subtle */}
-            <AnimatedBackground />
+            {!isHomeView && (
+                <>
+                    {/* Animated Mesh Background - Desaturated & Subtle */}
+                    <AnimatedBackground />
 
-            {/* Minimal Noise Overlay */}
-            <div className="fixed inset-0 z-50 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+                    {/* Minimal Noise Overlay */}
+                    <div className="fixed inset-0 z-50 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+                </>
+            )}
 
             {/* BOOT SCREEN OVERLAY */}
             <AnimatePresence>
@@ -140,6 +149,12 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                             SYSTEM BOOT SEQUENCE
                         </motion.div>
 
+                        <div className="text-primary/80 flex flex-col items-center gap-3 relative z-10">
+                            <div className="text-[11px] tracking-[0.45em] uppercase text-muted">
+                                Running checks...
+                            </div>
+                        </div>
+
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -161,20 +176,20 @@ export default function SystemShell({ children }: { children: React.ReactNode })
             </AnimatePresence>
 
             {/* Top Status Bar */}
-            <header className="h-12 border-b border-border bg-background/80 backdrop-blur-md z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0 elevation-low">
+            <header className={`h-12 border-b border-border z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0 ${isHomeView ? 'bg-background' : 'bg-background/80 backdrop-blur-md elevation-low'}`}>
                 <button
                     onClick={handleSystemReset}
                     className="flex items-center gap-6 hover:opacity-80 transition-all duration-[280ms] ease-in-out group"
                     style={{ transitionDelay: '20ms' }}
                 >
-                    <span className="text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] relative">
+                    <span className={`text-primary relative ${isHomeView ? '' : 'drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]'}`}>
                         SYSTEM_HVY.OS
                         <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
                     </span>
                     <span className="hidden sm:inline-block opacity-50">KERNEL: 5.0.0-rc1</span>
                 </button>
                 <div className="flex items-center gap-4">
-                    <span className="text-green-500 animate-pulse">● ONLINE</span>
+                    <span className={`animate-pulse ${isHomeView ? 'text-foreground' : 'text-green-500'}`}>ONLINE</span>
                 </div>
             </header>
 
@@ -182,34 +197,47 @@ export default function SystemShell({ children }: { children: React.ReactNode })
             <div className="flex-1 flex overflow-hidden relative z-10">
 
                 {/* Left Sidebar (Module Selector) */}
-                <aside className="w-64 border-r border-border bg-black/20 backdrop-blur-sm hidden md:flex flex-col elevation-low">
-                    <div className="p-4 text-xs font-mono text-muted uppercase tracking-widest opacity-50 mb-2">Modules</div>
+                <aside className="w-64 border-r border-border hidden md:flex flex-col bg-black/20 backdrop-blur-sm elevation-low">
+                    <div className="p-4 text-xs font-sans text-muted uppercase tracking-widest opacity-50 mb-2">Navigate</div>
 
-                    {/* HOME Button */}
-                    <ModuleButton
-                        id="HOME"
-                        label="SYSTEM_OVERVIEW"
-                        icon={Home}
-                        active={!activeModule}
-                        onClick={handleSystemReset}
-                    />
+                    <Link
+                        href="/"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isHomeView || (!isProjectsRoute && !isExperienceRoute && !activeModule) ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        onMouseEnter={() => synth.playHover()}
+                    >
+                        <Home className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
+                            SYSTEM_OVERVIEW
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                    </Link>
+
+                    <Link
+                        href="/projects"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isProjectsRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        onMouseEnter={() => synth.playHover()}
+                    >
+                        <Database className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
+                            PROJECTS
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                    </Link>
+
+                    <Link
+                        href="/experience"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isExperienceRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        onMouseEnter={() => synth.playHover()}
+                    >
+                        <Terminal className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
+                            SYS_LOGS
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                    </Link>
 
                     <div className="h-px bg-border my-2 mx-4"></div>
 
-                    <ModuleButton
-                        id="PROJECTS"
-                        label="PROJECTS"
-                        icon={Database}
-                        active={activeModule === 'PROJECTS'}
-                        onClick={() => mountModule('PROJECTS')}
-                    />
-                    <ModuleButton
-                        id="EXPERIENCE"
-                        label="SYS_LOGS"
-                        icon={Terminal}
-                        active={activeModule === 'EXPERIENCE'}
-                        onClick={() => mountModule('EXPERIENCE')}
-                    />
                     <ModuleButton
                         id="STACK"
                         label="DEPENDENCIES"
@@ -245,7 +273,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                 {/* Center Viewport */}
                 <main className="flex-1 relative flex flex-col">
                     {/* Content Area */}
-                    <div className="flex-1 overflow-y-auto p-8 relative scrollbar-hide">
+                    <div className={`flex-1 overflow-y-auto relative scrollbar-hide ${isHomeView ? 'px-6 py-12 md:px-12 lg:px-16' : 'p-8'}`}>
                         <AnimatePresence mode="wait">
                             {state === 'LOADING_MODULE' ? (
                                 <motion.div
@@ -276,7 +304,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                                     {renderActiveModule()}
                                 </motion.div>
                             ) : (
-                                <div className="h-full w-full">
+                                <div className={`h-full w-full ${isHomeView ? 'max-w-6xl mx-auto' : ''}`}>
                                     {children}
                                 </div>
                             )}
@@ -284,7 +312,9 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     </div>
 
                     {/* Bottom Log Console */}
-                    <LogStream />
+                    {!isHomeView && (
+                        <LogStream />
+                    )}
                 </main>
 
             </div>
