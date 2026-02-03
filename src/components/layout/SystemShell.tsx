@@ -94,17 +94,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     };
 
     return (
-        <div className={`min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-background overflow-hidden relative flex flex-col ${isHomeView ? 'theme-home' : 'font-mono'}`}>
-
-            {!isHomeView && (
-                <>
-                    {/* Animated Mesh Background - Desaturated & Subtle */}
-                    <AnimatedBackground />
-
-                    {/* Minimal Noise Overlay */}
-                    <div className="fixed inset-0 z-50 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-                </>
-            )}
+        <div className="min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-background overflow-hidden relative flex flex-col theme-home">
 
             {/* BOOT SCREEN OVERLAY */}
             <AnimatePresence>
