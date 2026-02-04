@@ -151,6 +151,26 @@ class AudioSynth {
         osc.start();
         osc.stop(this.ctx!.currentTime + 0.3);
     }
+
+    public playType() {
+        if (!this.initCheck() || this.isMuted) return;
+
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, this.ctx!.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(420, this.ctx!.currentTime + 0.04);
+
+        gain.gain.setValueAtTime(0.02, this.ctx!.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx!.currentTime + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start();
+        osc.stop(this.ctx!.currentTime + 0.05);
+    }
     private ambientOsc: OscillatorNode | null = null;
     private ambientGain: GainNode | null = null;
 

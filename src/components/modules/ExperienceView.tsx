@@ -9,9 +9,11 @@ export default function ExperienceView() {
         <div className="space-y-10 pb-12">
             <section className="relative border border-border bg-secondary px-8 py-8">
                 <div className="absolute -inset-2 border border-border/40 pointer-events-none" />
-                <div className="text-[11px] uppercase tracking-[0.6em] text-muted">System Logs</div>
-                <h1 className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Experience</h1>
-                <div className="mt-4 text-xs font-mono text-muted">KERNEL_HISTORY_FOUND: {experience.length}</div>
+                <div className="relative z-10">
+                    <div className="text-[11px] uppercase tracking-[0.55em] text-muted">EP_03 — LAB NOTES</div>
+                    <h1 className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Experience</h1>
+                    <div className="mt-4 text-xs font-mono text-muted">LOG_ENTRIES: {experience.length}</div>
+                </div>
             </section>
 
             <section className="relative border border-border bg-background px-6 py-6">

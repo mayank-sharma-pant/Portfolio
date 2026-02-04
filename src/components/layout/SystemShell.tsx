@@ -1,8 +1,7 @@
 ﻿'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import AnimatedBackground from '@/components/ui/AnimatedBackground';
 import LogStream from '@/components/system/LogStream';
 import { useSystem } from '@/context/SystemContext';
 import { Database, Terminal, Cpu, Activity, Lock, Home, Terminal as Terminal2, Mail } from 'lucide-react';
@@ -16,6 +15,7 @@ import AccessView from '@/components/modules/AccessView';
 import { synth } from '@/utils/audio-engine';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Lenis from 'lenis';
 
 // Sub-components for cleanliness
 const ModuleButton = ({ id, label, icon: Icon, active, onClick }: any) => (
@@ -57,6 +57,8 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     const isHomeView = pathname === '/' && !activeModule;
     const isProjectsRoute = pathname === '/projects';
     const isExperienceRoute = pathname === '/experience';
+    const scrollWrapperRef = useRef<HTMLDivElement>(null);
+    const scrollContentRef = useRef<HTMLDivElement>(null);
 
     const handleSystemReset = () => {
         synth.playClick();
@@ -69,6 +71,35 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     useEffect(() => {
         bootSystem();
     }, [bootSystem]);
+
+    useEffect(() => {
+        // Attempt to start ambient sound on load (will no-op if blocked).
+        synth.start();
+    }, []);
+
+    useEffect(() => {
+        if (!scrollWrapperRef.current || !scrollContentRef.current) return;
+
+        const lenis = new Lenis({
+            wrapper: scrollWrapperRef.current,
+            content: scrollContentRef.current,
+            duration: 1.2,
+            smoothWheel: true,
+            easing: (t: number) => 1 - Math.pow(1 - t, 3),
+        });
+
+        let rafId = 0;
+        const raf = (time: number) => {
+            lenis.raf(time);
+            rafId = requestAnimationFrame(raf);
+        };
+        rafId = requestAnimationFrame(raf);
+
+        return () => {
+            cancelAnimationFrame(rafId);
+            lenis.destroy();
+        };
+    }, []);
 
 
     // Central Router Logic
@@ -105,17 +136,18 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8"
                     >
                         {/* Enhanced Boot Background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-cyan-500/10 animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent animate-pulse" />
                         <div className="absolute inset-0">
                             {[...Array(20)].map((_, i) => (
                                 <div
                                     key={i}
                                     className="absolute w-1 h-1 bg-primary/30 animate-ping"
                                     style={{
-                                        left: `${Math.random() * 100}%`,
-                                        top: `${Math.random() * 100}%`,
-                                        animationDelay: `${Math.random() * 2}s`,
-                                        animationDuration: `${2 + Math.random() * 2}s`
+                                        // Deterministic layout to avoid hydration mismatches in SSR.
+                                        left: `${(i * 37) % 100}%`,
+                                        top: `${(i * 53) % 100}%`,
+                                        animationDelay: `${((i * 0.17) % 2).toFixed(2)}s`,
+                                        animationDuration: `${(2 + (i * 0.19) % 2).toFixed(2)}s`
                                     }}
                                 />
                             ))}
@@ -124,10 +156,10 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         <motion.div
                             initial={{ scale: 0, rotate: -180 }}
                             animate={{ scale: 1, rotate: 0 }}
-                            transition={{ duration: 0.8, ease: 'backOut' }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="relative z-10"
                         >
-                            <Lock className="w-16 h-16 text-primary mb-8 animate-pulse-glow drop-shadow-[0_0_20px_rgba(63,185,224,0.8)]" />
+                            <Lock className="w-16 h-16 text-primary mb-8 animate-pulse drop-shadow-[0_0_18px_rgba(225,91,91,0.55)]" />
                         </motion.div>
 
                         <motion.div
@@ -175,28 +207,31 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                 )}
             </AnimatePresence>
 
-            {/* Top Status Bar */}
-            <header className={`h-12 border-b border-border z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0 ${isHomeView ? 'bg-background' : 'bg-background/80 backdrop-blur-md elevation-low'}`}>
-                <button
-                    onClick={handleSystemReset}
-                    className="flex items-center gap-6 hover:opacity-80 transition-all duration-[280ms] ease-in-out group"
-                    style={{ transitionDelay: '20ms' }}
-                >
-                    <span className={`text-primary relative ${isHomeView ? '' : 'drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]'}`}>
-                        SYSTEM_HVY.OS
-                        <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
-                    </span>
-                    <span className="hidden sm:inline-block opacity-50">KERNEL: 5.0.0-rc1</span>
-                </button>
-                <div className="flex items-center gap-4">
-                    <span className={`animate-pulse ${isHomeView ? 'text-foreground' : 'text-green-500'}`}>ONLINE</span>
-                </div>
-            </header>
+            {/* Top Status Bar (hidden on HOME to avoid "dashboard" framing) */}
+            {!isHomeView && (
+                <header className={`h-12 border-b border-border z-40 flex items-center justify-between px-6 text-xs font-bold tracking-[0.2em] text-muted select-none shrink-0 bg-background/80 backdrop-blur-md elevation-low`}>
+                    <button
+                        onClick={handleSystemReset}
+                        className="flex items-center gap-6 hover:opacity-80 transition-all duration-[280ms] ease-in-out group"
+                        style={{ transitionDelay: '20ms' }}
+                    >
+                        <span className={`text-primary relative drop-shadow-[0_0_10px_rgba(225,91,91,0.65)]`}>
+                            SYSTEM_HVY.OS
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                        <span className="hidden sm:inline-block opacity-50">KERNEL: 5.0.0-rc1</span>
+                    </button>
+                    <div className="flex items-center gap-4">
+                        <span className={`animate-pulse text-green-500`}>ONLINE</span>
+                    </div>
+                </header>
+            )}
 
             {/* Main Console Grid */}
             <div className="flex-1 flex overflow-hidden relative z-10">
 
                 {/* Left Sidebar (Module Selector) */}
+                {!isHomeView && (
                 <aside className="w-64 border-r border-border hidden md:flex flex-col bg-black/20 backdrop-blur-sm elevation-low">
                     <div className="p-4 text-xs font-sans text-muted uppercase tracking-widest opacity-50 mb-2">Navigate</div>
 
@@ -269,46 +304,52 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         />
                     </div>
                 </aside>
+                )}
 
                 {/* Center Viewport */}
                 <main className="flex-1 relative flex flex-col">
                     {/* Content Area */}
-                    <div className={`flex-1 overflow-y-auto relative scrollbar-hide ${isHomeView ? 'px-6 py-12 md:px-12 lg:px-16' : 'p-8'}`}>
-                        <AnimatePresence mode="wait">
-                            {state === 'LOADING_MODULE' ? (
-                                <motion.div
-                                    key="loader"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-                                >
-                                    <div className="w-64 h-1 bg-secondary overflow-hidden relative">
-                                        <motion.div
-                                            className="absolute inset-0 bg-primary"
-                                            initial={{ x: '-100%' }}
-                                            animate={{ x: '100%' }}
-                                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                                        />
+                    <div
+                        ref={scrollWrapperRef}
+                        className={`flex-1 overflow-y-auto relative scrollbar-hide ${isHomeView ? 'p-0' : 'p-8'}`}
+                    >
+                        <div ref={scrollContentRef} className="relative min-h-full">
+                            <AnimatePresence mode="wait">
+                                {state === 'LOADING_MODULE' ? (
+                                    <motion.div
+                                        key="loader"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+                                    >
+                                        <div className="w-64 h-1 bg-secondary overflow-hidden relative">
+                                            <motion.div
+                                                className="absolute inset-0 bg-primary"
+                                                initial={{ x: '-100%' }}
+                                                animate={{ x: '100%' }}
+                                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                            />
+                                        </div>
+                                        <p className="mt-4 font-mono text-xs text-primary/70 animate-pulse">MOUNTING PROCESS...</p>
+                                    </motion.div>
+                                ) : state === 'ACTIVE_MODULE' && activeModule ? (
+                                    <motion.div
+                                        key={activeModule}
+                                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        transition={{ duration: 0.2, ease: 'circOut' }}
+                                        className="max-w-5xl mx-auto w-full"
+                                    >
+                                        {renderActiveModule()}
+                                    </motion.div>
+                                ) : (
+                                    <div className="h-full w-full">
+                                        {children}
                                     </div>
-                                    <p className="mt-4 font-mono text-xs text-primary/70 animate-pulse">MOUNTING PROCESS...</p>
-                                </motion.div>
-                            ) : state === 'ACTIVE_MODULE' && activeModule ? (
-                                <motion.div
-                                    key={activeModule}
-                                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    transition={{ duration: 0.2, ease: 'circOut' }}
-                                    className="max-w-5xl mx-auto w-full"
-                                >
-                                    {renderActiveModule()}
-                                </motion.div>
-                            ) : (
-                                <div className={`h-full w-full ${isHomeView ? 'max-w-6xl mx-auto' : ''}`}>
-                                    {children}
-                                </div>
-                            )}
-                        </AnimatePresence>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
 
                     {/* Bottom Log Console */}

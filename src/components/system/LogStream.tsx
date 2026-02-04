@@ -19,10 +19,12 @@ type LogStreamVariant = 'default' | 'light';
 
 export default function LogStream({
     variant = 'default',
-    label
+    label,
+    heightClassName = 'h-48'
 }: {
     variant?: LogStreamVariant;
     label?: string;
+    heightClassName?: string;
 }) {
     const { logs, activeModule, mountModule, pushLog, clearLogs } = useSystem();
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,7 @@ export default function LogStream({
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [enhancedLogs, setEnhancedLogs] = useState<LogEntry[]>([]);
     const [pulse, setPulse] = useState(false);
+    const typingTickRef = useRef<number | null>(null);
 
     // Sync enhanced logs with system logs
     useEffect(() => {
@@ -56,6 +59,27 @@ export default function LogStream({
         const timer = setTimeout(() => setPulse(false), 300);
         return () => clearTimeout(timer);
     }, [logs.length]);
+
+    useEffect(() => {
+        const hasTyping = enhancedLogs.some(log => log.isTyping);
+        if (hasTyping && typingTickRef.current === null) {
+            typingTickRef.current = window.setInterval(() => {
+                synth.playType();
+            }, 90);
+        }
+
+        if (!hasTyping && typingTickRef.current !== null) {
+            window.clearInterval(typingTickRef.current);
+            typingTickRef.current = null;
+        }
+
+        return () => {
+            if (typingTickRef.current !== null) {
+                window.clearInterval(typingTickRef.current);
+                typingTickRef.current = null;
+            }
+        };
+    }, [enhancedLogs]);
 
     // Detect if user has scrolled away from bottom
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -164,8 +188,8 @@ export default function LogStream({
     };
 
     const containerClassName = variant === 'light'
-        ? 'h-48 w-full border-t border-border bg-transparent font-mono text-xs overflow-hidden font-medium flex flex-col'
-        : 'h-48 w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col';
+        ? `${heightClassName} w-full border-t border-border bg-transparent font-mono text-xs overflow-hidden font-medium flex flex-col`
+        : `${heightClassName} w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col`;
 
     return (
         <div className={`${containerClassName} relative`}>

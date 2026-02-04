@@ -41,11 +41,13 @@ export default function ProjectsView() {
         <div className="space-y-10 pb-12">
             <section className="relative border border-border bg-secondary px-8 py-8">
                 <div className="absolute -inset-2 border border-border/40 pointer-events-none" />
-                <div className="text-[11px] uppercase tracking-[0.6em] text-muted">Project Registry</div>
-                <h1 className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Projects</h1>
-                <div className="mt-4 text-xs font-mono text-muted flex items-center gap-4">
-                    <span>TOTAL_NODES: {projects.length}</span>
-                    <span className="text-primary">SYSTEM_ACTIVE</span>
+                <div className="relative z-10">
+                    <div className="text-[11px] uppercase tracking-[0.55em] text-muted">EP_02 — PROJECT LOG</div>
+                    <h1 className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Projects</h1>
+                    <div className="mt-4 text-xs font-mono text-muted flex items-center gap-4">
+                        <span>TOTAL_NODES: {projects.length}</span>
+                        <span className="text-primary">STATUS: ACTIVE</span>
+                    </div>
                 </div>
             </section>
 
