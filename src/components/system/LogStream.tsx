@@ -189,7 +189,7 @@ export default function LogStream({
 
     const containerClassName = variant === 'light'
         ? `${heightClassName} w-full border-t border-border bg-transparent font-mono text-xs overflow-hidden font-medium flex flex-col`
-        : `${heightClassName} w-full border-t border-border bg-black/40 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] flex flex-col`;
+        : `${heightClassName} w-full border-t border-border bg-[#0f1012]/45 backdrop-blur-sm font-mono text-xs overflow-hidden font-medium shadow-[inset_0_10px_30px_rgba(0,0,0,0.45)] flex flex-col`;
 
     return (
         <div className={`${containerClassName} relative`}>
@@ -247,15 +247,20 @@ export default function LogStream({
             </div>
 
             {/* Enhanced Terminal Input */}
-            <div className={`border-t border-primary/20 p-3 flex items-center gap-2 relative overflow-hidden ${variant === 'light' ? 'bg-transparent' : 'bg-black/60'}`}>
-                {/* Subtle input glow */}
+            <div
+                className={`border-t border-primary/20 p-3 flex items-center gap-2 relative overflow-hidden
+                focus-within:shadow-[0_0_0_1px_rgba(225,91,91,0.16),0_0_28px_rgba(225,91,91,0.10)]
+                ${variant === 'light' ? 'bg-transparent focus-within:bg-[#0a0a0a]/18' : 'bg-[#0f1012]/60'}`}
+            >
+                {/* Subtle input wash (no gradients) */}
                 {variant !== 'light' && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
+                    <div className="absolute inset-0 bg-primary/5 opacity-30" />
                 )}
 
                 <span className="text-primary relative z-10">{getPrompt(activeModule)}</span>
                 <input
                     ref={inputRef}
+                    data-terminal-input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -271,9 +276,9 @@ export default function LogStream({
                     className="w-2 h-4 bg-primary/50 relative z-10"
                 />
 
-                {/* Data flow effect */}
+                {/* Data line (no gradients) */}
                 {variant !== 'light' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-primary/25 opacity-60" />
                 )}
             </div>
         </div>

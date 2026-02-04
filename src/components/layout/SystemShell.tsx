@@ -55,8 +55,10 @@ export default function SystemShell({ children }: { children: React.ReactNode })
     const { state, activeModule, mountModule, bootSystem } = useSystem();
     const pathname = usePathname();
     const isHomeView = pathname === '/' && !activeModule;
-    const isProjectsRoute = pathname === '/projects';
-    const isExperienceRoute = pathname === '/experience';
+    const isWorkRoute = pathname === '/work';
+    const isSystemsRoute = pathname === '/systems';
+    const isLogsRoute = pathname === '/logs';
+    const isContactRoute = pathname === '/contact';
     const scrollWrapperRef = useRef<HTMLDivElement>(null);
     const scrollContentRef = useRef<HTMLDivElement>(null);
 
@@ -133,10 +135,10 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     <motion.div
                         exit={{ opacity: 0, scale: 1.1, filter: 'blur(20px)' }}
                         transition={{ duration: 1 }}
-                        className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8"
+                        className="fixed inset-0 z-[100] bg-[#0b0b0b] flex flex-col items-center justify-center p-8"
                     >
-                        {/* Enhanced Boot Background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent animate-pulse" />
+                        {/* Boot wash (no gradients) */}
+                        <div className="absolute inset-0 bg-primary/10 animate-pulse" />
                         <div className="absolute inset-0">
                             {[...Array(20)].map((_, i) => (
                                 <div
@@ -201,11 +203,58 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                             initial={{ width: 0 }}
                             animate={{ width: '100%' }}
                             transition={{ duration: 2, delay: 0.8, ease: 'easeInOut' }}
-                            className="absolute bottom-8 left-8 right-8 h-0.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50 rounded-full"
+                            className="absolute bottom-8 left-8 right-8 h-0.5 bg-primary/70 rounded-full"
                         />
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* HOME QUICK NAV (keeps HOME layout intact; provides route access) */}
+            {isHomeView && state !== 'BOOT' && (
+                <nav className="fixed top-6 left-6 z-[70] rounded-full border border-border bg-[#121316]/60 backdrop-blur-[16px] px-4 py-2 text-[10px] font-mono tracking-[0.35em] uppercase text-foreground/80">
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/work"
+                            onMouseEnter={() => synth.playHover()}
+                            onClick={() => synth.playClick()}
+                            className="group relative"
+                        >
+                            WORK
+                            <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+                        </Link>
+                        <span className="opacity-30">/</span>
+                        <Link
+                            href="/systems"
+                            onMouseEnter={() => synth.playHover()}
+                            onClick={() => synth.playClick()}
+                            className="group relative"
+                        >
+                            SYSTEMS
+                            <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+                        </Link>
+                        <span className="opacity-30">/</span>
+                        <Link
+                            href="/logs"
+                            onMouseEnter={() => synth.playHover()}
+                            onClick={() => synth.playClick()}
+                            className="group relative"
+                        >
+                            LOGS
+                            <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+                        </Link>
+                        <span className="opacity-30">/</span>
+                        <Link
+                            href="/contact"
+                            onMouseEnter={() => synth.playHover()}
+                            onClick={() => synth.playClick()}
+                            className="group relative"
+                        >
+                            CONTACT
+                            <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+                        </Link>
+                    </div>
+                </nav>
+            )}
 
             {/* Top Status Bar (hidden on HOME to avoid "dashboard" framing) */}
             {!isHomeView && (
@@ -237,7 +286,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
 
                     <Link
                         href="/"
-                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isHomeView || (!isProjectsRoute && !isExperienceRoute && !activeModule) ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isHomeView ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
                         onMouseEnter={() => synth.playHover()}
                     >
                         <Home className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
@@ -248,25 +297,49 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     </Link>
 
                     <Link
-                        href="/projects"
-                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isProjectsRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        href="/work"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isWorkRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
                         onMouseEnter={() => synth.playHover()}
                     >
                         <Database className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
                         <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
-                            PROJECTS
+                            WORK
                             <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
                         </span>
                     </Link>
 
                     <Link
-                        href="/experience"
-                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isExperienceRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        href="/systems"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isSystemsRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        onMouseEnter={() => synth.playHover()}
+                    >
+                        <Cpu className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
+                            SYSTEMS
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                    </Link>
+
+                    <Link
+                        href="/logs"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isLogsRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
                         onMouseEnter={() => synth.playHover()}
                     >
                         <Terminal className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
                         <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
-                            SYS_LOGS
+                            LOGS
+                            <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
+                        </span>
+                    </Link>
+
+                    <Link
+                        href="/contact"
+                        className={`w-full flex items-center gap-4 p-4 relative overflow-hidden group border-l-2 transition-all duration-[280ms] ease-in-out ${isContactRoute ? 'border-primary bg-primary/10 text-primary elevation-mid' : 'border-transparent text-muted hover:text-foreground hover:bg-white/5'}`}
+                        onMouseEnter={() => synth.playHover()}
+                    >
+                        <Mail className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="font-sans text-[11px] tracking-[0.2em] uppercase relative">
+                            CONTACT
                             <span className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-hover:w-full transition-all duration-200" />
                         </span>
                     </Link>
@@ -311,9 +384,14 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     {/* Content Area */}
                     <div
                         ref={scrollWrapperRef}
-                        className={`flex-1 overflow-y-auto relative scrollbar-hide ${isHomeView ? 'p-0' : 'p-8'}`}
+                        data-scroll-wrapper
+                        className={`flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-hide ${isHomeView ? 'p-0' : 'p-8'}`}
                     >
-                        <div ref={scrollContentRef} className="relative min-h-full">
+                        <div
+                            ref={scrollContentRef}
+                            data-scroll-content
+                            className="relative min-h-full"
+                        >
                             <AnimatePresence mode="wait">
                                 {state === 'LOADING_MODULE' ? (
                                     <motion.div
@@ -338,7 +416,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                                         key={activeModule}
                                         initial={{ opacity: 0, y: 10, scale: 0.98 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        transition={{ duration: 0.2, ease: 'circOut' }}
+                                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                                         className="max-w-5xl mx-auto w-full"
                                     >
                                         {renderActiveModule()}
@@ -352,8 +430,31 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         </div>
                     </div>
 
-                    {/* Bottom Log Console */}
-                    {!isHomeView && (
+                    {/* Bottom Terminal HUD (HOME docks the terminal; other pages keep the default console) */}
+                    {isHomeView ? (
+                        state !== 'BOOT' && (
+                            <div className="fixed bottom-6 left-6 z-[60] w-[min(720px,92vw)]">
+                                <div className="relative">
+                                    <div
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute -top-3 right-3 flex items-center gap-2 text-[10px] font-mono tracking-[0.38em] uppercase text-foreground/70"
+                                    >
+                                        <span className="h-1.5 w-1.5 rounded-full bg-primary/70 animate-pulse" />
+                                        Try: help
+                                    </div>
+                                    <div
+                                        className="rounded-xl border border-border bg-[#121316]/60 backdrop-blur-[16px] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.45)] terminal-core"
+                                    >
+                                        <LogStream
+                                            variant="light"
+                                            label="System Activity"
+                                            heightClassName="h-[24vh]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    ) : (
                         <LogStream />
                     )}
                 </main>

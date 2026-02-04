@@ -1,101 +1,53 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useSystem } from '@/context/SystemContext';
-import LogStream from '@/components/system/LogStream';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 /**
- * HOME — "ANIME NERD PERSONAL SPACE"
- *
- * Rules this implementation follows:
- * - Anime image is OBVIOUS and occupies the hero as a real object (not a texture).
- * - Terminal remains a core interactive feature (visually dominant, impossible to miss).
- * - Heavy GSAP choreography: big entrances, parallax, scroll-driven motion.
- * - No bounce / elastic easing.
+ * HOME - ANIME SYSTEMS / CONTROLLED CHAOS
+ * Constraints:
+ * - Keep existing text content (no rewrites).
+ * - Hero: left text, right framed manga panel (<= ~45% width), never touching screen edges.
+ * - Dark charcoal UI (no pure black, no gradients, no neon).
+ * - Controlled asymmetry: everything aligns to an invisible spine.
+ * - GSAP: calm, confident easing only (no bounce/overshoot).
  */
 export default function SystemOverview() {
-  const { logs, state, pushLog } = useSystem();
+  const { state, pushLog } = useSystem();
 
   const rootRef = useRef<HTMLDivElement>(null);
-  const heroRef = useRef<HTMLElement>(null);
 
-  const heroFigureRef = useRef<HTMLDivElement>(null);
-  const heroFigureImgRef = useRef<HTMLImageElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  const heroImageWrapRef = useRef<HTMLDivElement>(null);
   const heroGhostRef = useRef<HTMLDivElement>(null);
-  const heroKickerRef = useRef<HTMLDivElement>(null);
+  const heroPanelClipRef = useRef<HTMLDivElement>(null);
+  const heroWashRef = useRef<HTMLDivElement>(null);
+
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
-  const heroBodyRef = useRef<HTMLParagraphElement>(null);
+  const heroSubRef = useRef<HTMLParagraphElement>(null);
   const heroMetaRef = useRef<HTMLDivElement>(null);
 
-  const terminalWrapRef = useRef<HTMLDivElement>(null);
-  const terminalFrameRef = useRef<HTMLDivElement>(null);
-  const terminalPulseRef = useRef<HTMLDivElement>(null);
-  const operatorRef = useRef<HTMLDivElement>(null);
+  const blockNowRef = useRef<HTMLDivElement>(null);
+  const blockCapRef = useRef<HTMLDivElement>(null);
+  const blockFocusRef = useRef<HTMLDivElement>(null);
+  const blockContextRef = useRef<HTMLDivElement>(null);
+  const blockSignalsRef = useRef<HTMLDivElement>(null);
+  const blockLinksRef = useRef<HTMLDivElement>(null);
 
-  const seededRef = useRef(false);
-  const introPlayedRef = useRef(false);
-  const guideDismissedRef = useRef(false);
-  const [guideVisible, setGuideVisible] = useState(true);
+  const imageSrc = useMemo(
+    () => '/anime/6d185bf59cb5624bd019a541b4974da3.jpg',
+    []
+  );
 
-  const terminalHeight = useMemo(() => 'h-[320px] md:h-[360px] lg:h-[420px]', []);
-
-  const dismissGuide = () => {
-    if (guideDismissedRef.current) return;
-    guideDismissedRef.current = true;
-
-    if (!operatorRef.current) {
-      setGuideVisible(false);
-      return;
-    }
-
-    gsap.to(operatorRef.current, {
-      autoAlpha: 0,
-      y: 14,
-      duration: 0.55,
-      ease: 'power2.inOut',
-      onComplete: () => setGuideVisible(false),
-    });
-  };
-
-  const focusTerminal = () => {
-    if (!terminalFrameRef.current) return;
-    gsap.to(terminalFrameRef.current, {
-      scale: 1.01,
-      duration: 0.45,
-      ease: 'power2.inOut',
-    });
-  };
-
-  const blurTerminal = () => {
-    const frame = terminalFrameRef.current;
-    if (!frame) return;
-
-    // Avoid jitter when focus moves between children inside the terminal.
-    requestAnimationFrame(() => {
-      const active = document.activeElement;
-      if (active && frame.contains(active)) return;
-      gsap.to(frame, {
-        scale: 1,
-        duration: 0.45,
-        ease: 'power2.inOut',
-      });
-    });
-  };
-
-  // Seed a short "inner monologue" burst so the terminal feels intentional even before user input.
   useEffect(() => {
     if (state === 'BOOT') return;
-    if (seededRef.current) return;
-    seededRef.current = true;
-
     const timers = [
-      window.setTimeout(() => pushLog('SYSTEM_READY. Waiting for input…', 'SYSTEM'), 350),
-      window.setTimeout(() => pushLog("Tip: type 'help' to explore.", 'INFO'), 1100),
+      window.setTimeout(() => pushLog('SYSTEM_READY.', 'SYSTEM'), 420),
       window.setTimeout(
-        () => pushLog("Operator online. // don’t overthink it — just try a command.", 'SYSTEM'),
-        1900
+        () => pushLog("Type 'help' for commands...", 'INFO'),
+        1120
       ),
     ];
 
@@ -104,339 +56,646 @@ export default function SystemOverview() {
 
   useEffect(() => {
     if (state === 'BOOT') return;
-    if (introPlayedRef.current) return;
-    introPlayedRef.current = true;
-
     gsap.registerPlugin(ScrollTrigger);
 
-    const ctx = gsap.context(() => {
-      if (!heroRef.current) return;
+    const scroller = document.querySelector('[data-scroll-wrapper]') as
+      | HTMLElement
+      | null;
+    if (scroller) ScrollTrigger.defaults({ scroller });
 
-      // --- Initial states (heavy motion, no bounce) ---
-      gsap.set([heroKickerRef.current, heroTitleRef.current, heroBodyRef.current, heroMetaRef.current], {
-        y: 26,
+    const ctx = gsap.context(() => {
+      // Initial states
+      gsap.set([heroTitleRef.current, heroSubRef.current, heroMetaRef.current], {
+        y: 16,
         opacity: 0,
       });
+      gsap.set(heroTextRef.current, { x: -16, opacity: 0 });
+      gsap.set(heroImageWrapRef.current, { x: 18, opacity: 0, scale: 0.99 });
       gsap.set(heroGhostRef.current, { opacity: 0, y: 10 });
+      gsap.set(heroWashRef.current, { opacity: 0, scale: 0.98 });
+      gsap.set(heroPanelClipRef.current, { clipPath: 'inset(0 0 100% 0)' });
+      gsap.set(
+        [
+          blockNowRef.current,
+          blockCapRef.current,
+          blockFocusRef.current,
+          blockContextRef.current,
+          blockSignalsRef.current,
+          blockLinksRef.current,
+        ],
+        { y: 16, opacity: 0 }
+      );
+      gsap.set('[data-seam]', { scaleX: 0.5, opacity: 0 });
 
-      if (heroFigureRef.current) {
-        gsap.set(heroFigureRef.current, {
-          clipPath: 'inset(0 100% 0 0)',
-          x: 120,
-          rotate: 2,
-          opacity: 1,
-        });
-      }
-
-      if (terminalWrapRef.current) {
-        gsap.set(terminalWrapRef.current, { y: 80, opacity: 0, scale: 0.98 });
-      }
-
-      if (operatorRef.current) {
-        gsap.set(operatorRef.current, { opacity: 0, y: 8 });
-      }
-
-      const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
-
-      // 1) Image presence resolves early (obvious anime signal).
-      intro
-        .to(heroGhostRef.current, { opacity: 0.14, y: 0, duration: 0.9 }, 0)
+      const tl = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
+      tl.to(heroTitleRef.current, { y: 0, opacity: 1, duration: 0.6 }, 0)
+        .to(heroSubRef.current, { y: 0, opacity: 1, duration: 0.55 }, 0.12)
+        .to(heroMetaRef.current, { y: 0, opacity: 1, duration: 0.45 }, 0.26)
+        .to(heroTextRef.current, { x: 0, opacity: 1, duration: 0.45 }, 0.22)
+        .to(heroGhostRef.current, { opacity: 0.08, y: 0, duration: 0.75 }, 0.18)
+        .to(heroWashRef.current, { opacity: 1, scale: 1, duration: 0.65 }, 0.16)
+        .to(heroPanelClipRef.current, { clipPath: 'inset(0 0 0% 0)', duration: 0.75 }, 0.32)
+        .to(heroImageWrapRef.current, { x: 0, opacity: 1, scale: 1, duration: 0.7 }, 0.42)
         .to(
-          heroFigureRef.current,
-          {
-            clipPath: 'inset(0 0% 0 0)',
-            x: 0,
-            rotate: 0,
-            duration: 1.25,
-          },
-          0.1
+          [
+            blockNowRef.current,
+            blockCapRef.current,
+            blockFocusRef.current,
+            blockContextRef.current,
+            blockSignalsRef.current,
+            blockLinksRef.current,
+          ],
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.08 },
+          0.62
         )
-        // 2) Typography drama (delayed resolve).
-        .to(heroKickerRef.current, { y: 0, opacity: 1, duration: 0.55 }, 0.25)
-        .to(heroTitleRef.current, { y: 0, opacity: 1, duration: 0.75 }, 0.35)
-        .to(heroBodyRef.current, { y: 0, opacity: 1, duration: 0.6 }, 0.55)
-        .to(heroMetaRef.current, { y: 0, opacity: 1, duration: 0.55 }, 0.7);
+        .to('[data-seam]', { scaleX: 1, opacity: 1, duration: 0.65, stagger: 0.08 }, 0.55);
 
-      // 3) Terminal enters as the "brain" (dominant, unavoidable).
-      if (terminalWrapRef.current) {
-        intro.to(terminalWrapRef.current, { y: 0, opacity: 1, scale: 1, duration: 0.95 }, 0.85);
-      }
+      // One-time intro flicker (subtle)
+      tl.to(
+        heroTitleRef.current,
+        { opacity: 0.85, x: 1, duration: 0.06, ease: 'none' },
+        0.58
+      )
+        .to(heroTitleRef.current, { opacity: 1, x: -1, duration: 0.06, ease: 'none' }, 0.64)
+        .to(heroTitleRef.current, { opacity: 1, x: 0, duration: 0.1, ease: 'power1.inOut' }, 0.7);
 
-      // 4) Operator guide (minimal silhouette, fades on interaction).
-      if (operatorRef.current) {
-        intro
-          .to(operatorRef.current, { opacity: 1, y: 0, duration: 0.55 }, 1.25)
-          .to(operatorRef.current, { y: -4, duration: 0.9, yoyo: true, repeat: 1 }, 1.35);
-      }
-
-      // --- Scroll-driven motion (parallax + tension) ---
-      if (heroFigureImgRef.current) {
-        gsap.to(heroFigureImgRef.current, {
-          y: -90,
-          rotate: -1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: true,
-          },
+      // Terminal breathing (subtle)
+      const terminal = document.querySelector('.terminal-core');
+      if (terminal) {
+        gsap.to(terminal, {
+          y: -2,
+          duration: 3.2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'power1.inOut',
         });
       }
 
-      if (heroGhostRef.current) {
-        gsap.to(heroGhostRef.current, {
-          y: -60,
+      // Very subtle hero panel parallax
+      if (heroImageWrapRef.current) {
+        gsap.to(heroImageWrapRef.current, {
+          y: -10,
           ease: 'none',
           scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: true,
-          },
-        });
-      }
-
-      if (terminalWrapRef.current) {
-        gsap.to(terminalWrapRef.current, {
-          y: -18,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: terminalWrapRef.current,
+            trigger: heroImageWrapRef.current,
             start: 'top 85%',
-            end: 'bottom 20%',
-            scrub: true,
+            end: 'bottom top',
+            scrub: 0.65,
           },
         });
       }
+
+      // Controlled drift on blocks
+      const blocks = [
+        blockNowRef.current,
+        blockCapRef.current,
+        blockFocusRef.current,
+        blockContextRef.current,
+        blockSignalsRef.current,
+        blockLinksRef.current,
+      ];
+      blocks.forEach((node, idx) => {
+        if (!node) return;
+        ScrollTrigger.create({
+          trigger: node,
+          start: 'top 85%',
+          end: 'bottom 70%',
+          scrub: 0.5,
+          onUpdate: (self) => {
+            const drift = (idx % 2 === 0 ? -1 : 1) * self.progress * 10;
+            gsap.to(node, { x: drift, duration: 0.18, ease: 'power2.out' });
+          },
+        });
+      });
     }, rootRef);
 
     return () => ctx.revert();
   }, [state]);
 
-  // Terminal-driven UI response: pulse when new logs arrive.
-  useEffect(() => {
-    if (!terminalPulseRef.current) return;
-    if (logs.length === 0) return;
-
-    gsap.fromTo(
-      terminalPulseRef.current,
-      { opacity: 0 },
-      { opacity: 0.8, duration: 0.18, ease: 'power2.inOut', yoyo: true, repeat: 1 }
-    );
-  }, [logs.length]);
-
   return (
-    <div ref={rootRef} className="relative">
-      {/* HERO — chaotic, image-forward composition */}
-      <section ref={heroRef} className="relative overflow-visible pt-14 md:pt-20 pb-52 md:pb-60">
-        <div className="px-5 md:px-10 lg:px-14">
-          <div className="relative">
-            {/* Ghost typography (drama layer) */}
+    <div ref={rootRef} className="relative w-full text-foreground">
+      {/* HERO */}
+      <section className="relative px-8 md:px-14 lg:px-20 pt-7 pb-4">
+        {/* Soft ink wash behind the reading area (no gradients) */}
+        <div
+          ref={heroWashRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-32 -top-24 h-[34rem] w-[54rem] rounded-full bg-background/70 blur-3xl"
+        />
+        {/* Ghost typography + spine */}
+        <div
+          ref={heroGhostRef}
+          aria-hidden="true"
+          className="absolute left-8 md:left-14 top-3 select-none pointer-events-none leading-[0.88] font-semibold tracking-[-0.02em] text-foreground/5 text-[clamp(4rem,8.5vw,8.5rem)]"
+        >
+          Mayank
+          <br />
+          Sharma
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute left-[48%] top-0 bottom-0 w-px bg-foreground/10"
+        />
+
+        <div className="relative flex items-center justify-between gap-10">
+          {/* Left: Text */}
+          <div ref={heroTextRef} className="relative w-[55%]">
+            {/* Panel marks */}
             <div
-              ref={heroGhostRef}
-              className="pointer-events-none select-none absolute -top-10 left-0 text-[64px] md:text-[92px] lg:text-[120px] font-semibold tracking-[-0.02em] text-foreground/10"
+              aria-hidden="true"
+              className="absolute -left-6 top-2 h-px w-5 bg-foreground/25"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute -left-6 top-2 w-3 h-3 border-l border-t border-foreground/25"
+            />
+
+            <h1
+              ref={heroTitleRef}
+              className="text-[clamp(2.6rem,5.5vw,6rem)] leading-[0.95] font-semibold"
             >
-              PERSONAL SPACE
+              Mayank
+              <br />
+              Sharma
+            </h1>
+
+            <p
+              ref={heroSubRef}
+              className="mt-4 text-lg leading-relaxed text-foreground/90 max-w-[56ch]"
+            >
+              Backend-focused intern and startup co-founder. I design APIs, build
+              backend systems, and ship MVPs with real users.
+            </p>
+
+            <div
+              ref={heroMetaRef}
+              className="mt-5 text-xs uppercase tracking-[0.45em] text-muted"
+            >
+              BACKEND · PRODUCT SYSTEMS · HEALTHTECH
+            </div>
+            <div className="mt-3 text-sm text-muted">
+              B.Tech CSE at Chandigarh University (2022-2026)
             </div>
 
-            {/* Text block */}
-            <div className="relative z-20 max-w-[760px]">
+            {/* Rhythm line */}
+            <div aria-hidden="true" className="mt-6 flex items-center gap-3">
+              <div className="h-px w-10 bg-primary/60" />
+              <div className="h-px w-20 bg-foreground/12" />
+            </div>
+          </div>
+
+          {/* Right: Framed manga panel */}
+          <div ref={heroImageWrapRef} className="relative w-[40%] -mb-10">
+            {/* Offset outline (panel stacking) */}
+            <div
+              aria-hidden="true"
+              className="absolute -inset-3 border border-foreground/10"
+            />
+            <div className="relative border border-border p-4 bg-background/50">
+              {/* Corner marks */}
               <div
-                ref={heroKickerRef}
-                className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted"
-              >
-                EP_01 — ORIGIN // anime nerd, system builder
-              </div>
-              <h1
-                ref={heroTitleRef}
-                className="mt-5 text-6xl md:text-7xl lg:text-8xl font-semibold tracking-[-0.03em] leading-[0.9] text-foreground"
-              >
-                Mayank
-                <span className="block ml-[0.08em]">Sharma</span>
-              </h1>
-              <p
-                ref={heroBodyRef}
-                className="mt-5 max-w-[44ch] text-base md:text-lg text-foreground/85 leading-relaxed"
-              >
-                I build backend systems that stay calm under pressure — APIs, data models, and MVPs that ship.
-                <span className="text-muted"> // serious work, nerd energy</span>
-              </p>
+                aria-hidden="true"
+                className="absolute left-3 top-3 w-4 h-4 border-l border-t border-foreground/25"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute right-3 top-3 w-4 h-4 border-r border-t border-foreground/25"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute left-3 bottom-3 w-4 h-4 border-l border-b border-foreground/12"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute right-3 bottom-3 w-4 h-4 border-r border-b border-foreground/12"
+              />
 
-              <div ref={heroMetaRef} className="mt-7 flex flex-wrap gap-2.5">
-                <span className="inline-flex items-center gap-2 border border-border bg-secondary px-3 py-1.5 text-[11px] tracking-[0.25em] uppercase text-foreground/85">
-                  CURRENT ARC <span className="text-primary">BUILDING</span>
-                </span>
-                <span className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-[11px] tracking-[0.25em] uppercase text-muted font-mono">
-                  FOCUS: Backend
-                </span>
-                <span className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-[11px] tracking-[0.25em] uppercase text-muted font-mono">
-                  STACK: Java · Spring · SQL
-                </span>
-              </div>
-            </div>
-
-            {/* Hero image as a real object (NOT texture) */}
-            <div
-              ref={heroFigureRef}
-              className="relative z-10 mt-10 lg:mt-0 lg:absolute lg:right-[-140px] lg:top-[-70px] w-full max-w-[560px] lg:w-[min(760px,58vw)]"
-              style={{
-                clipPath: 'inset(0 100% 0 0)',
-              }}
-            >
-              <div className="relative">
-                {/* Manga-panel-ish frame */}
-                <div className="absolute -inset-3 border border-border/40 rotate-[-1deg]" aria-hidden="true" />
-                <div className="absolute -inset-1 border border-border/70 rotate-[1deg]" aria-hidden="true" />
-
+              <div
+                ref={heroPanelClipRef}
+                className="relative overflow-hidden h-[62vh] bg-[#111217]"
+              >
+                <img
+                  src={imageSrc}
+                  alt="Ichigo Kurosaki"
+                  className="w-full h-full object-contain object-center grayscale contrast-125 brightness-95 opacity-95"
+                />
+                {/* Darken whites to match the ink UI */}
+                <div className="absolute inset-0 bg-[#0b0b0b]/45" />
+                {/* Subtle grain */}
                 <div
-                  className="relative border border-border bg-black/40 overflow-hidden"
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none opacity-[0.085] mix-blend-overlay"
                   style={{
-                    clipPath: 'polygon(0 0, 96% 0, 100% 12%, 100% 100%, 10% 100%, 0 88%)',
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E\")",
                   }}
-                >
-                  <img
-                    ref={heroFigureImgRef}
-                    src="/anime/6d185bf59cb5624bd019a541b4974da3.jpg"
-                    alt=""
-                    aria-hidden="true"
-                    className="w-full h-full object-contain invert grayscale contrast-125 opacity-95 select-none pointer-events-none"
-                    style={{
-                      WebkitMaskImage:
-                        'linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)',
-                      maskImage:
-                        'linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%)',
-                    }}
-                  />
-                </div>
-
-                {/* Loud cut-lines (energy layer) */}
-                <div className="absolute inset-0 pointer-events-none opacity-60 mix-blend-screen" aria-hidden="true">
-                  <div className="hero-cutlines" />
-                </div>
+                />
               </div>
             </div>
+
+            <div
+              aria-hidden="true"
+              className="absolute -left-6 top-6 h-px w-6 bg-primary/60"
+            />
           </div>
         </div>
 
-        {/* TERMINAL — visually dominant and overlapped */}
-        {state !== 'BOOT' && (
-          <div className="absolute left-0 right-0 -bottom-32 md:-bottom-36">
-            <div className="px-5 md:px-10 lg:px-14">
-              <div ref={terminalWrapRef} className="relative w-full max-w-[1120px] ml-0 lg:ml-auto">
-                <div
-                  ref={terminalPulseRef}
-                  className="absolute -inset-1 border border-primary/30 opacity-0 pointer-events-none"
-                  aria-hidden="true"
-                />
-
-                <div
-                  ref={terminalFrameRef}
-                  className="relative border border-border bg-black/55 backdrop-blur-sm origin-center"
-                  onMouseEnter={focusTerminal}
-                  onMouseLeave={blurTerminal}
-                  onFocusCapture={focusTerminal}
-                  onBlurCapture={blurTerminal}
-                >
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full bg-primary/70" />
-                      <div className="text-[11px] tracking-[0.45em] uppercase text-muted">SYSTEM BRAIN</div>
-                    </div>
-                    <div className="text-[10px] font-mono text-muted">
-                      TRY: <span className="text-foreground/80">help</span> ·{' '}
-                      <span className="text-foreground/80">ls</span>
-                    </div>
-                  </div>
-
-                  {/* Operator guide: minimal silhouette + gesture */}
-                  {guideVisible && (
-                    <div
-                      ref={operatorRef}
-                      className="absolute right-6 -top-10 z-20 pointer-events-none select-none"
-                      aria-hidden="true"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-14 text-foreground/80">
-                          <div className="absolute top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-current opacity-90" />
-                          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-5 h-6 rounded-[10px] bg-current opacity-70" />
-                          <div className="absolute top-8 left-1/2 -translate-x-1/2 w-8 h-7 rounded-[18px] bg-current opacity-20" />
-                          <div className="absolute top-8 left-7 w-6 h-[2px] bg-primary/80 rotate-[18deg] origin-left" />
-                        </div>
-                        <div className="text-[11px] tracking-[0.28em] uppercase text-foreground/85">Interact.</div>
-                      </div>
-                      <div className="absolute right-12 top-10 w-20 h-px bg-primary/70" />
-                    </div>
-                  )}
-
-                  <div
-                    onMouseEnter={dismissGuide}
-                    onFocusCapture={dismissGuide}
-                    onPointerDown={dismissGuide}
-                    className="px-0"
-                  >
-                    <LogStream label="System Activity" heightClassName={terminalHeight} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Divider */}
+        <div className="mt-6 h-px w-full bg-foreground/12" />
       </section>
 
-      {/* Below-the-fold — still tight, still personal (not resume-y) */}
-      <section className="px-5 md:px-10 lg:px-14 pt-44 md:pt-48 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-7">
-          <div className="relative border border-border bg-secondary px-7 py-8">
-            <div className="text-[11px] uppercase tracking-[0.5em] text-muted">ACTIVE PROJECT</div>
-            <div className="mt-4 text-3xl md:text-4xl font-semibold text-foreground">Healiora</div>
-            <p className="mt-4 text-base text-foreground/85 leading-relaxed max-w-[62ch]">
-              HealthTech product focused on patient & hospital workflows. I own product direction and the backend
-              architecture.
-            </p>
-            <div className="mt-5 text-xs uppercase tracking-[0.3em] text-muted font-mono">
-              // shipping in public · iterating fast
+      {/* STRUCTURED SPREAD */}
+      <section className="relative px-8 md:px-14 lg:px-20 pt-3 pb-6 -mt-10">
+        {/* Spine */}
+        <div
+          aria-hidden="true"
+          className="absolute left-[48%] top-0 h-full w-px bg-foreground/12"
+        />
+        {/* Rhythm seams */}
+        <div
+          data-seam
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-[18%] h-px bg-foreground/10 origin-left"
+        />
+        <div
+          data-seam
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-[52%] h-px bg-foreground/10 origin-left"
+        />
+        <div
+          data-seam
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-[82%] h-px bg-foreground/10 origin-left"
+        />
+        {/* Subtle band for depth (no gradients, not a "card") */}
+        <div
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-[34%] h-40 bg-foreground/[0.03]"
+        />
+
+        <div className="relative space-y-6">
+          {/* NOW (left) */}
+          <div
+            ref={blockNowRef}
+            className="relative w-[44%] pt-2 pb-1 pr-6
+            after:content-[''] after:absolute after:-right-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -left-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              NOW
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="relative border-l border-foreground/10 pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/60"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  ROLE
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Backend Developer Intern
+                </div>
+                <div className="mt-0.5 text-sm text-foreground/85">
+                  SunEdge IT Solutions
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  BUILD
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Co-founder and product-focused engineer
+                </div>
+                <div className="mt-0.5 text-sm text-foreground/85">
+                  Healiora (CU-TBI Incubated)
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="relative border border-border bg-background px-7 py-8">
-            <div className="text-[11px] uppercase tracking-[0.5em] text-muted">SYSTEM STATE</div>
-            <ul className="mt-5 space-y-3 text-base text-foreground/90">
-              <li className="flex items-start gap-3">
-                <span className="mt-2 w-1.5 h-1.5 bg-primary/70" />
-                API design with sharp boundaries
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-2 w-1.5 h-1.5 bg-primary/70" />
-                Data modeling + reliability work
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-2 w-1.5 h-1.5 bg-primary/70" />
-                Product loops that feel intuitive
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-2 w-1.5 h-1.5 bg-primary/70" />
-                Iteration based on real feedback
-              </li>
-            </ul>
+          {/* CAPABILITIES (right, interlocks upward) */}
+          <div
+            ref={blockCapRef}
+            className="relative w-[42%] ml-auto -mt-3 pt-2 pb-1 pl-6
+            after:content-[''] after:absolute after:-left-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -right-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              CAPABILITIES
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="relative border-l border-foreground/10 pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/60"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  BACKEND
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Design and build REST APIs
+                </div>
+                <div className="mt-0.5 text-sm text-foreground/85">
+                  Implement clean backend architecture
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  MOBILE
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Develop Android applications
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  SHIP
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Ship MVPs with real users
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FOCUS (left) */}
+          <div
+            ref={blockFocusRef}
+            className="relative w-[44%] -mt-1 pt-2 pb-1 pr-6
+            after:content-[''] after:absolute after:-right-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -left-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              FOCUS
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="relative border-l border-foreground/10 pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/60"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  SYSTEMS
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Backend APIs and clean architecture
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  PRODUCT
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Real-world product development
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  INTERACTION
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Frontend fundamentals and interaction systems
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CONTEXT (right) */}
+          <div
+            ref={blockContextRef}
+            className="relative w-[42%] ml-auto -mt-3 pt-2 pb-1 pl-6
+            after:content-[''] after:absolute after:-left-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -right-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              CONTEXT
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="relative border-l border-foreground/10 pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/60"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  WORK
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Backend Intern - SunEdge IT Solutions
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  FOUNDING
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Co-founder - Healiora (CU-TBI Incubated)
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  EDUCATION
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  B.Tech CSE - Chandigarh University
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SIGNALS (left) */}
+          <div
+            ref={blockSignalsRef}
+            className="relative w-[44%] -mt-1 pt-2 pb-1 pr-6
+            after:content-[''] after:absolute after:-right-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -left-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              SIGNALS
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="relative border-l border-foreground/10 pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/60"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  Active modules
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Projects, Dependencies, Sys Logs
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  Primary stack
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Java / Spring Boot / SQL
+                </div>
+              </div>
+
+              <div className="relative border-l border-foreground/10 pl-4 ml-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[3px] top-[6px] h-1.5 w-1.5 rounded-full bg-primary/45"
+                />
+                <div className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted/90">
+                  Current phase
+                </div>
+                <div className="mt-1 text-sm text-foreground/85">
+                  Skill Expansion (Frontend)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* LINKS (right) */}
+          <div
+            ref={blockLinksRef}
+            className="relative w-[42%] ml-auto -mt-3 pt-2 pb-1 pl-6
+            after:content-[''] after:absolute after:-left-[9.5vw] after:top-4 after:h-px after:w-[9.5vw] after:bg-foreground/10"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute -right-6 top-2 h-px w-6 bg-foreground/20"
+            />
+            <div className="font-mono text-[11px] tracking-[0.4em] uppercase text-muted mb-2">
+              LINKS
+            </div>
+            <a
+              className="link-node group flex items-center gap-2 text-sm text-foreground/85 w-fit ml-0"
+              href="https://github.com/mayank-sharma-pant"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="link-node__dot h-1.5 w-1.5 rounded-full bg-primary/70 shadow-[0_0_0_3px_rgba(225,91,91,0.10)]" />
+              <span className="link-node__text relative">
+                github.com/mayank-sharma-pant
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+              </span>
+            </a>
+            <a
+              className="link-node group flex items-center gap-2 text-sm text-foreground/85 w-fit mt-2 ml-2"
+              href="https://linkedin.com/in/mayank-sharma-a747ba275/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="link-node__dot h-1.5 w-1.5 rounded-full bg-primary/45 shadow-[0_0_0_3px_rgba(225,91,91,0.08)]" />
+              <span className="link-node__text relative">
+                linkedin.com/in/mayank-sharma-a747ba275/
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+              </span>
+            </a>
+            <a
+              className="link-node group flex items-center gap-2 text-sm text-foreground/85 w-fit mt-2 ml-4"
+              href="https://x.com/nullbytez"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="link-node__dot h-1.5 w-1.5 rounded-full bg-primary/45 shadow-[0_0_0_3px_rgba(225,91,91,0.08)]" />
+              <span className="link-node__text relative">
+                x.com/nullbytez
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+              </span>
+            </a>
+            <a
+              className="link-node group flex items-center gap-2 text-sm text-foreground/85 w-fit mt-2 ml-1"
+              href="mailto:mayanksharmarrk01@gmail.com"
+            >
+              <span className="link-node__dot h-1.5 w-1.5 rounded-full bg-primary/45 shadow-[0_0_0_3px_rgba(225,91,91,0.08)]" />
+              <span className="link-node__text relative">
+                mayanksharmarrk01@gmail.com
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary/70 transition-all duration-200 group-hover:w-full" />
+              </span>
+            </a>
           </div>
         </div>
+      </section>
 
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-7">
-          <div className="relative border border-border bg-background px-7 py-8">
-            <div className="text-[11px] uppercase tracking-[0.5em] text-muted">EXIT</div>
-            <p className="mt-4 text-base text-foreground/85 leading-relaxed max-w-[64ch]">
-              I’m not here to cosplay “senior.” I’m here to build systems that work, ship, and get better with time.
-            </p>
+      {/* END OF LOG */}
+      <section className="relative px-8 md:px-14 lg:px-20 pt-1 pb-[calc(24vh+56px)] -mt-2">
+        <div
+          aria-hidden="true"
+          className="absolute left-[48%] top-0 bottom-0 w-px bg-foreground/10"
+        />
+
+        <div className="relative ml-auto w-[52%] pt-4">
+          <div className="font-mono text-[11px] tracking-[0.45em] uppercase text-muted">
+            SESSION COMPLETE
           </div>
-          <div className="relative border border-border bg-secondary px-7 py-8">
-            <div className="text-[11px] uppercase tracking-[0.5em] text-muted">CONTACT</div>
-            <div className="mt-4 space-y-2 text-base text-foreground/90">
-              <div>github.com/mayank-sharma-pant</div>
-              <div>linkedin.com/in/mayank-sharma-a747ba275/</div>
-              <div>x.com/nullbytez</div>
-              <div>mayanksharmarrk01@gmail.com</div>
-            </div>
+          <div className="mt-3 text-sm text-foreground/80 max-w-[56ch]">
+            End of log. System idle.
+          </div>
+
+          <div className="mt-5 font-mono text-xs text-muted">
+            <span className="text-primary">system@hvy:~$</span> tail -f sys_activity
+            <span className="inline-block ml-2 h-3 w-[2px] bg-primary/60 align-[-2px] animate-pulse" />
+          </div>
+
+          <div aria-hidden="true" className="mt-6 flex items-center gap-3">
+            <div className="h-px w-14 bg-primary/60" />
+            <div className="h-px flex-1 bg-foreground/12" />
           </div>
         </div>
       </section>
