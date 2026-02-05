@@ -33,7 +33,8 @@ const tiles = [
 
 export default function SystemSnapshot() {
     return (
-        <div className="w-full border-y border-white/10 bg-black/25 backdrop-blur-sm">
+        <div className="relative w-full border-y border-white/10 bg-black/25 backdrop-blur-sm overflow-hidden">
+            <div className="panel-shimmer" />
             <div className="grid grid-cols-12 gap-x-6">
                 {tiles.map((tile, i) => {
                     const needsTopBorder = i > 1;
@@ -46,13 +47,14 @@ export default function SystemSnapshot() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.3, delay: 0.06 * i }}
                             className={[
-                                'col-span-12 sm:col-span-6 lg:col-span-3 px-4 py-3 flex items-center gap-3',
+                                'relative col-span-12 sm:col-span-6 lg:col-span-3 px-4 py-3 flex items-center gap-3',
                                 'max-h-24 min-h-[72px]',
                                 needsTopBorder ? 'sm:border-t lg:border-t-0 border-white/10' : '',
                                 needsLeftBorder ? 'sm:border-l border-white/10' : '',
                                 i > 0 ? 'lg:border-l border-white/10' : '',
                             ].join(' ')}
                         >
+                            <div className="scanline-sweep opacity-10" />
                             <tile.icon className="w-4 h-4 text-primary/80" />
                             <div className="flex flex-col gap-1 leading-tight">
                                 <div className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">

@@ -77,10 +77,19 @@ export default function SystemOverview() {
                   Build clean primitives. Ship stable systems.
                 </p>
               </div>
+
+              <div className="mt-3 flex items-center gap-3">
+                <span className="h-px w-10 bg-primary/70" />
+                <span className="h-px w-24 bg-foreground/15" />
+                <span className="text-[10px] font-mono uppercase tracking-[0.35em] text-muted">
+                  SIGNAL_STABLE
+                </span>
+              </div>
             </div>
 
             {/* Compact metadata row: ROLE / FOCUS / MODE */}
-            <div className="w-full max-w-xl border border-white/5 bg-black/20 backdrop-blur-sm">
+            <div className="relative w-full max-w-xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden">
+              <div className="panel-shimmer" />
               <div className="grid grid-cols-3 divide-x divide-white/10">
                 {[
                   { k: 'ROLE', v: 'BACKEND_ENGINEER' },
@@ -117,6 +126,8 @@ export default function SystemOverview() {
                     className="w-full h-full object-contain opacity-90 grayscale hover:grayscale-0 transition-all duration-300"
                   />
                   <div className="absolute inset-0 pointer-events-none bg-black/35" />
+                  <div className="scanline-sweep" />
+                  <div className="panel-shimmer" />
                 </div>
               </div>
             </div>

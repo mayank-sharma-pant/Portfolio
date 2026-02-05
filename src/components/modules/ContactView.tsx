@@ -29,8 +29,17 @@ export default function ContactView() {
         </div>
       </section>
 
-      <section className="relative border border-border bg-background px-5 py-5">
-        <div className="absolute -inset-2 border border-border/30 pointer-events-none" />
+      <section className="relative border border-border bg-background px-5 py-5 overflow-hidden">
+        <div className="absolute -inset-2 border border-border/30 pointer-events-none z-20" />
+        <div className="anime-panel">
+          <img
+            src="/anime/Kurapika.jpg"
+            alt="Communication Link"
+            className="anime-bg anime-bg--section"
+          />
+          <div className="anime-panel__veil" />
+          <div className="panel-shimmer" />
+        </div>
 
         <div className="relative grid grid-cols-[1.1fr_0.9fr] gap-8 h-[62vh]">
           <motion.div
@@ -125,4 +134,3 @@ export default function ContactView() {
     </div>
   );
 }
-

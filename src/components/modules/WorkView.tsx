@@ -75,8 +75,17 @@ export default function WorkView() {
         </div>
       </section>
 
-      <section className="relative border border-border bg-background px-5 py-5">
-        <div className="absolute -inset-2 border border-border/30 pointer-events-none" />
+      <section className="relative border border-border bg-background px-5 py-5 overflow-hidden">
+        <div className="absolute -inset-2 border border-border/30 pointer-events-none z-20" />
+        <div className="anime-panel">
+          <img
+            src="/anime/FMAB.jpg"
+            alt="Engineering Protocol"
+            className="anime-bg anime-bg--section"
+          />
+          <div className="anime-panel__veil" />
+          <div className="panel-shimmer" />
+        </div>
 
         <div className="relative grid grid-cols-[300px_1fr] gap-0 h-[66vh]">
           {/* Left: Index */}
@@ -124,17 +133,6 @@ export default function WorkView() {
 
           {/* Right: Details */}
           <div className="relative pl-6 overflow-y-auto h-full">
-            {/* Background Watermark - Edward Elric */}
-            <div className="absolute top-0 right-0 w-[400px] h-[500px] pointer-events-none overflow-hidden opacity-[0.07] mix-blend-luminosity z-0">
-              <img
-                src="/FMAB.jpg"
-                alt="Engineering Protocol"
-                className="w-full h-full object-cover grayscale contrast-125"
-              />
-              <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-            </div>
-
             <AnimatePresence mode="wait">
               {selected && (
                 <motion.div
