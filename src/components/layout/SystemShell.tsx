@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -430,32 +430,20 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         </div>
                     </div>
 
-                    {/* Bottom Terminal HUD (HOME docks the terminal; other pages keep the default console) */}
-                    {isHomeView ? (
-                        state !== 'BOOT' && (
-                            <div className="fixed bottom-6 left-6 z-[60] w-[min(720px,92vw)]">
-                                <div className="relative">
-                                    <div
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute -top-3 right-3 flex items-center gap-2 text-[10px] font-mono tracking-[0.38em] uppercase text-foreground/70"
-                                    >
+                    {/* Bottom Terminal HUD - Narrow, Bottom-Left */}
+                    {state !== 'BOOT' && (
+                        <div className="fixed bottom-4 left-20 md:left-52 z-50" style={{ width: '340px' }}>
+                            <div className="bg-black/80 backdrop-blur-xl border border-border rounded-lg overflow-hidden shadow-2xl">
+                                <div className="px-3 py-2 border-b border-border/50 bg-white/5 flex items-center justify-between">
+                                    <span className="font-mono text-[10px] text-muted tracking-wider">TERMINAL</span>
+                                    <div className="flex items-center gap-2">
                                         <span className="h-1.5 w-1.5 rounded-full bg-primary/70 animate-pulse" />
-                                        Try: help
-                                    </div>
-                                    <div
-                                        className="rounded-xl border border-border bg-[#121316]/60 backdrop-blur-[16px] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.45)] terminal-core"
-                                    >
-                                        <LogStream
-                                            variant="light"
-                                            label="System Activity"
-                                            heightClassName="h-[24vh]"
-                                        />
+                                        <span className="text-[9px] text-muted/70 font-mono">Try: help</span>
                                     </div>
                                 </div>
+                                <LogStream variant="light" heightClassName="h-28" />
                             </div>
-                        )
-                    ) : (
-                        <LogStream />
+                        </div>
                     )}
                 </main>
 
