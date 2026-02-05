@@ -56,8 +56,17 @@ export default function LogsView() {
         </div>
       </section>
 
-      <section className="relative border border-border bg-background px-5 py-5 h-[66vh] overflow-y-auto">
-        <div className="absolute -inset-2 border border-border/30 pointer-events-none" />
+      <section className="relative border border-border bg-background px-5 py-5 h-[66vh] overflow-y-auto overflow-hidden">
+        <div className="absolute -inset-2 border border-border/30 pointer-events-none z-20" />
+        <div className="anime-panel">
+          <img
+            src="/anime/Ippo.jpg"
+            alt="Training Logs"
+            className="anime-bg anime-bg--section"
+          />
+          <div className="anime-panel__veil" />
+          <div className="panel-shimmer" />
+        </div>
 
         <div className="relative">
           {/* Timeline spine */}

@@ -170,6 +170,68 @@ body {
   filter: grayscale(1) blur(3px);
 }
 
+.anime-panel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.anime-panel__veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 55%);
+  opacity: 0.6;
+}
+
+.panel-shimmer {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(115deg, transparent 30%, rgba(59, 130, 246, 0.12) 50%, transparent 70%);
+  animation: panelShimmer 6s linear infinite;
+  opacity: 0.15;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.scanline-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
+  opacity: 0.2;
+  animation: scanlineSweep 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.scanline-sweep--hero {
+  animation-duration: 7s;
+  opacity: 0.15;
+}
+
+.image-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+.hero-blade::after {
+  content: '';
+  position: absolute;
+  inset: 12% 6%;
+  border-right: 1px solid rgba(237, 234, 227, 0.35);
+  box-shadow: 0 0 18px rgba(237, 234, 227, 0.25);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.hero-blade:hover::after {
+  opacity: 0.6;
+}
+
 .terminal-core {
   box-shadow: 0 0 0 1px rgba(237, 234, 227, 0.18);
   transition: box-shadow 200ms ease;
@@ -226,6 +288,46 @@ body {
   50% {
     transform: translateY(-3px);
   }
+}
+
+@keyframes panelShimmer {
+  0% {
+    transform: translateX(-20%) translateY(-10%);
+  }
+  50% {
+    transform: translateX(20%) translateY(10%);
+  }
+  100% {
+    transform: translateX(-20%) translateY(-10%);
+  }
+}
+
+@keyframes scanlineSweep {
+  0% {
+    transform: translateY(-15%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(15%);
+    opacity: 0;
+  }
+}
+
+@keyframes gridDrift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+
+  100% {
+    background-position: 60px 40px, 40px 60px;
+  }
+}
+
+.grid-drift {
+  animation: gridDrift 40s linear infinite;
 }
 
 @keyframes runnerLeg {
@@ -397,6 +499,25 @@ body {
   }
 }
 
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  45% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(0.9);
+  }
+}
+
+.heartbeat-dot {
+  animation: heartbeat 2.6s ease-in-out infinite;
+}
+
 .link-node {
   text-decoration: none;
   transition: transform 220ms ease, filter 220ms ease, color 220ms ease;
@@ -417,6 +538,27 @@ body {
   outline: none;
   border-radius: 8px;
   box-shadow: 0 0 0 1px rgba(225, 91, 91, 0.3), 0 0 24px rgba(225, 91, 91, 0.12);
+}
+
+.nav-underline {
+  overflow: hidden;
+}
+
+.nav-underline__line {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 8px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
+  opacity: 0.6;
+}
+
+.nav-underline:hover .nav-underline__line {
+  transform: scaleX(1);
 }
 
 

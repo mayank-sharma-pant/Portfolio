@@ -77,7 +77,18 @@ export default function AccessView() {
                 <p className="mt-4 text-xs text-muted">Contact interface & resume access</p>
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="relative">
+                <div className="anime-panel">
+                    <img
+                        src="/anime/kisuke-urahara-bleach-4k-ultra-hd-fanart-660is9s5w1m9rk9l.jpg"
+                        alt="Access Protocol"
+                        className="anime-bg anime-bg--section"
+                    />
+                    <div className="anime-panel__veil" />
+                    <div className="panel-shimmer" />
+                </div>
+
+                <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -208,6 +219,7 @@ export default function AccessView() {
                         </div>
                     </div>
                 </motion.div>
+                </div>
             </div>
         </div>
     );
