@@ -56,11 +56,29 @@ export default function SystemOverview() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       </div>
 
-      <div className="relative z-10 w-full pt-6 pb-10 flex flex-col gap-6">
+      <div className="relative z-10 w-full pt-4 pb-6 flex flex-col gap-5">
         {/* ZONE 1 — HERO (7 / 5 grid) */}
-        <section className="grid grid-cols-12 gap-x-6 gap-y-8 items-start lg:min-h-[520px]">
+        <section className="grid grid-cols-12 gap-x-6 gap-y-6 items-start lg:min-h-[480px]">
           {/* LEFT (7 cols) */}
-          <div ref={heroTextRef} className="col-span-12 lg:col-span-7 flex flex-col gap-4 pt-1 min-w-0">
+          <div ref={heroTextRef} className="col-span-12 lg:col-span-7 flex flex-col gap-3 pt-1 min-w-0">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[0.95] text-foreground">
+                Mayank <br />
+                <span className="text-muted/30">Sharma</span>
+              </h1>
+
+              <div className="min-w-0">
+                <div className="text-lg md:text-xl font-semibold tracking-tight text-foreground/90">
+                  Backend Engineer
+                </div>
+                <p className="mt-2 text-sm md:text-base text-muted font-mono max-w-xl leading-relaxed">
+                  Designing resilient APIs and scalable system architectures.
+                  <br />
+                  Build clean primitives. Ship stable systems.
+                </p>
+              </div>
+            </div>
+
             {/* Compact metadata row: ROLE / FOCUS / MODE */}
             <div className="w-full max-w-xl border border-white/5 bg-black/20 backdrop-blur-sm">
               <div className="grid grid-cols-3 divide-x divide-white/10">
@@ -80,24 +98,6 @@ export default function SystemOverview() {
                 ))}
               </div>
             </div>
-
-            <div className="flex flex-col gap-3">
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[0.92] text-foreground">
-                Mayank <br />
-                <span className="text-muted/30">Sharma</span>
-              </h1>
-
-              <div className="min-w-0">
-                <div className="text-lg md:text-xl font-semibold tracking-tight text-foreground/90">
-                  Backend Engineer
-                </div>
-                <p className="mt-2 text-sm md:text-base text-muted font-mono max-w-xl leading-relaxed">
-                  Designing resilient APIs and scalable system architectures.
-                  <br />
-                  Build clean primitives. Ship stable systems.
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* RIGHT (5 cols) — Manga panel, fully visible */}
@@ -106,7 +106,7 @@ export default function SystemOverview() {
               ref={heroImageWrapRef}
               className="w-full max-w-[420px] rotate-1 hover:rotate-0 transition-transform duration-300 ease-out"
             >
-              <div className="relative h-[520px] max-h-[520px] border border-white/10 bg-white/[0.02] backdrop-blur-sm p-2 shadow-2xl overflow-hidden">
+              <div className="relative h-[420px] lg:h-[480px] border border-white/10 bg-white/[0.02] backdrop-blur-sm p-2 shadow-2xl overflow-hidden">
                 <div className="absolute top-0 left-0 w-4 h-4 border-l border-t border-primary" />
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-primary" />
 
@@ -129,7 +129,7 @@ export default function SystemOverview() {
         </section>
 
         {/* ZONE 3 — TERMINAL (Right, grid-bound, 4–5 columns) */}
-        <section className="grid grid-cols-12 gap-x-6 gap-y-6 items-start">
+        <section className="grid grid-cols-12 gap-x-6 gap-y-5 items-start">
           <div className="col-span-12 lg:col-span-7 min-w-0">
             <div className="border border-white/5 bg-black/15 backdrop-blur-sm px-5 py-4">
               <div className="text-[10px] font-mono tracking-[0.35em] uppercase text-muted">
@@ -144,7 +144,7 @@ export default function SystemOverview() {
           </div>
 
           <div className="col-span-12 lg:col-start-8 lg:col-span-5 min-w-0">
-            <div className="ml-auto w-full max-w-[520px]">
+            <div className="ml-auto w-full max-w-[420px]">
               <HeroTerminal />
             </div>
           </div>
