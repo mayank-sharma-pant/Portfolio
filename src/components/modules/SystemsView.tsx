@@ -98,15 +98,14 @@ export default function SystemsView() {
 
       <section className="relative border border-border bg-background px-5 py-5 overflow-hidden">
         <div className="absolute -inset-2 border border-border/30 pointer-events-none z-20" />
-
-        {/* Background Image - Johann */}
-        <div className="absolute -right-10 top-0 w-[400px] h-[600px] pointer-events-none opacity-[0.06] mix-blend-luminosity z-0">
+        <div className="anime-panel">
           <img
-            src="/Johann.jpg"
+            src="/anime/Johann.jpg"
             alt="System Architecture"
-            className="w-full h-full object-cover grayscale contrast-125"
+            className="anime-bg anime-bg--section"
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-transparent" />
+          <div className="anime-panel__veil" />
+          <div className="panel-shimmer" />
         </div>
 
         <div className="relative z-10 grid grid-cols-2 gap-6 h-[66vh]">
