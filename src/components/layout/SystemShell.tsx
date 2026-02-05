@@ -11,6 +11,7 @@ import StackView from '@/components/modules/StackView';
 import HealioraView from '@/components/modules/HealioraView';
 import SystemCommandsView from '@/components/modules/SystemCommandsView';
 import AccessView from '@/components/modules/AccessView';
+import LayoutContainer from '@/components/layout/LayoutContainer';
 
 import { synth } from '@/utils/audio-engine';
 import { usePathname } from 'next/navigation';
@@ -210,62 +211,69 @@ export default function SystemShell({ children }: { children: React.ReactNode })
             </AnimatePresence>
 
             {/* TOP SYSTEM NAVIGATION (Unified) */}
-            <nav className="fixed top-0 left-0 right-0 z-[70] h-14 flex items-center px-6 border-b border-border bg-[#0b0b0b]/90 backdrop-blur-md">
-                <div className="flex items-center gap-6">
-                    <Link
-                        href="/"
-                        onClick={() => synth.playClick()}
-                        className="flex items-center gap-2 group"
-                    >
-                        <div className={`w-3 h-3 rounded-full ${isHomeView ? 'bg-primary animate-pulse' : 'bg-muted group-hover:bg-primary/50'}`} />
-                        <span className="font-mono text-xs font-bold tracking-widest text-foreground">
-                            SYSTEM_HVY
-                        </span>
-                    </Link>
+            <nav className="fixed top-0 left-0 right-0 z-[70] h-14 border-b border-border bg-[#0b0b0b]/90 backdrop-blur-md">
+                <LayoutContainer className="h-full flex items-center">
+                    <div className="flex items-center gap-6">
+                        <Link
+                            href="/"
+                            onClick={() => {
+                                synth.playClick();
+                                mountModule('RESET');
+                            }}
+                            className="flex items-center gap-2 group"
+                        >
+                            <div className={`w-3 h-3 rounded-full ${isHomeView ? 'bg-primary animate-pulse' : 'bg-muted group-hover:bg-primary/50'}`} />
+                            <span className="font-mono text-xs font-bold tracking-widest text-foreground">
+                                SYSTEM_HVY
+                            </span>
+                        </Link>
 
-                    {/* Desktop Tabs */}
-                    <div className="hidden md:flex items-center h-full ml-8">
-                        {[
-                            { label: 'WORK', path: '/work' },
-                            { label: 'SYSTEMS', path: '/systems' },
-                            { label: 'LOGS', path: '/logs' },
-                            { label: 'CONTACT', path: '/contact' }
-                        ].map((item) => {
-                            const isActive = pathname.startsWith(item.path);
-                            return (
-                                <Link
-                                    key={item.path}
-                                    href={item.path}
-                                    onMouseEnter={() => synth.playHover()}
-                                    onClick={() => synth.playClick()}
-                                    className={`relative h-14 px-6 flex items-center justify-center text-[10px] tracking-[0.2em] font-mono uppercase transition-all duration-300
-                                        ${isActive
-                                            ? 'text-primary bg-primary/5 border-b-2 border-primary'
-                                            : 'text-muted hover:text-foreground hover:bg-white/5 border-b-2 border-transparent'
-                                        }`}
-                                >
-                                    {item.label}
-                                </Link>
-                            );
-                        })}
+                        {/* Desktop Tabs */}
+                        <div className="hidden md:flex items-center h-full ml-8">
+                            {[
+                                { label: 'WORK', path: '/work' },
+                                { label: 'SYSTEMS', path: '/systems' },
+                                { label: 'LOGS', path: '/logs' },
+                                { label: 'CONTACT', path: '/contact' }
+                            ].map((item) => {
+                                const isActive = pathname.startsWith(item.path);
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        href={item.path}
+                                        onMouseEnter={() => synth.playHover()}
+                                        onClick={() => synth.playClick()}
+                                        className={`relative h-14 px-6 flex items-center justify-center text-[10px] tracking-[0.2em] font-mono uppercase transition-all duration-300
+                                            ${isActive
+                                                ? 'text-primary bg-primary/5 border-b-2 border-primary'
+                                                : 'text-muted hover:text-foreground hover:bg-white/5 border-b-2 border-transparent'
+                                            }`}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
 
-                {/* Right Side Status */}
-                <div className="ml-auto flex items-center gap-4">
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[9px] font-mono text-muted tracking-wider">ONLINE</span>
+                    {/* Right Side Status */}
+                    <div className="ml-auto flex items-center gap-4">
+                        <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[9px] font-mono text-muted tracking-wider">ONLINE</span>
+                        </div>
                     </div>
-                </div>
+                </LayoutContainer>
             </nav>
 
             {/* Main Console Grid */}
-            <div className="flex-1 flex overflow-hidden relative z-10 pt-14"> {/* Add padding-top for fixed nav */}
+            <div className="flex-1 overflow-hidden relative z-10 pt-14"> {/* Add padding-top for fixed nav */}
+                <LayoutContainer className="h-full">
+                    <div className="grid grid-cols-12 gap-x-6 h-full min-h-0">
 
-                {/* Left Sidebar (Module Selector) - ONLY INTERNAL PAGES */}
-                {!isHomeView && (
-                    <aside className="w-64 border-r border-border hidden md:flex flex-col bg-black/20 backdrop-blur-sm elevation-low">
+                        {/* Left Sidebar (Module Selector) - ONLY INTERNAL PAGES */}
+                        {!isHomeView && (
+                            <aside className="col-span-12 md:col-span-3 border-r border-border hidden md:flex flex-col bg-black/20 backdrop-blur-sm elevation-low min-h-0">
                         {/* ... sidebar content remains ... */}
                         {/* Sidebar navigation duplications can be removed or kept as rapid-access. 
                         Keeping them for now as secondary rapid access for internal pages is useful.
@@ -310,15 +318,15 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                             onClick={() => mountModule('ACCESS')}
                         />
                     </aside>
-                )}
+                        )}
 
-                {/* Center Viewport */}
-                <main className="flex-1 relative flex flex-col">
+                        {/* Center Viewport */}
+                        <main className={`col-span-12 ${!isHomeView ? 'md:col-span-9' : ''} relative flex flex-col min-h-0 min-w-0`}>
                     {/* Content Area */}
                     <div
                         ref={scrollWrapperRef}
                         data-scroll-wrapper
-                        className={`flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-hide ${isHomeView ? 'p-0' : 'p-8'}`}
+                        className={`flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-hide ${isHomeView ? 'py-0' : 'py-6'}`}
                     >
                         <div
                             ref={scrollContentRef}
@@ -350,13 +358,21 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                                         initial={{ opacity: 0, y: 10, scale: 0.98 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                                        className="max-w-5xl mx-auto w-full"
+                                        className="w-full min-w-0"
                                     >
-                                        {renderActiveModule()}
+                                        <div className="grid grid-cols-12 gap-x-6">
+                                            <div className="col-span-12 min-w-0">
+                                                {renderActiveModule()}
+                                            </div>
+                                        </div>
                                     </motion.div>
                                 ) : (
                                     <div className="h-full w-full">
-                                        {children}
+                                        <div className="grid grid-cols-12 gap-x-6">
+                                            <div className="col-span-12 min-w-0">
+                                                {children}
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </AnimatePresence>
@@ -379,7 +395,8 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                         </div>
                     )}
                 </main>
-
+                    </div>
+                </LayoutContainer>
             </div>
         </div>
     );

@@ -27,8 +27,8 @@ export default function HeroTerminal() {
             ref={containerRef}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="relative z-20 w-full max-w-2xl mx-auto"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
+            className="relative z-20 w-full max-w-[320px]"
         >
             {/* Glass Panel Construction */}
             <div className="relative rounded-lg overflow-hidden border border-white/10 bg-[#050505]/90 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)]">
@@ -62,7 +62,7 @@ export default function HeroTerminal() {
 
                     <LogStream
                         variant="light"
-                        heightClassName="h-[300px]"
+                        heightClassName="h-[220px]"
                     />
                 </div>
 
