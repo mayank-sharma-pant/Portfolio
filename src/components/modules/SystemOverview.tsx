@@ -1,28 +1,43 @@
 'use client';
 
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useSystem } from '@/context/SystemContext';
 import { gsap } from 'gsap';
 import HeroTerminal from '@/components/ui/HeroTerminal';
 import SystemSnapshot from '@/components/ui/SystemSnapshot';
+import TypewriterText from '@/components/ui/TypewriterText';
 
 export default function SystemOverview() {
   const { state, pushLog } = useSystem();
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const firstNameRef = useRef<HTMLSpanElement>(null);
+  const lastNameRef = useRef<HTMLSpanElement>(null);
+  const roleRef = useRef<HTMLDivElement>(null);
+  const metadataRefs = useRef<HTMLDivElement[]>([]);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const heroImageWrapRef = useRef<HTMLDivElement>(null);
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const [booted, setBooted] = useState(false);
+  const hoverRaf = useRef<number | null>(null);
   const imageSrc = useMemo(() => '/anime/6d185bf59cb5624bd019a541b4974da3.jpg', []);
+  const setMetadataRef = (index: number) => (node: HTMLDivElement | null) => {
+    if (node) {
+      metadataRefs.current[index] = node;
+    }
+  };
 
   useEffect(() => {
     if (state === 'BOOT') return;
+    setBooted(true);
 
     // Initial logs
     const timers = [
-      window.setTimeout(() => pushLog('SYSTEM_READY', 'SUCCESS'), 500),
-      window.setTimeout(() => pushLog('MOUNTING_VIEW: HOME', 'SYSTEM'), 800),
-      window.setTimeout(() => pushLog('ESTABLISHING_CONNECTION...', 'INFO'), 1200),
-      window.setTimeout(() => pushLog('INTERFACE_MODE: HIGH_PERFORMANCE', 'WARNING'), 2000),
+      window.setTimeout(() => pushLog('SYSTEM_READY', 'SUCCESS'), 420),
+      window.setTimeout(() => pushLog('MOUNTING_VIEW: HOME', 'SYSTEM'), 760),
+      window.setTimeout(() => pushLog('ESTABLISHING_CONNECTION...', 'INFO'), 1100),
+      window.setTimeout(() => pushLog('INTERFACE_MODE: HIGH_PERFORMANCE', 'WARNING'), 1700),
     ];
     return () => timers.forEach(window.clearTimeout);
   }, [state, pushLog]);
@@ -31,29 +46,63 @@ export default function SystemOverview() {
     if (state === 'BOOT') return;
 
     const ctx = gsap.context(() => {
-      // Intro Animation
+      gsap.set([badgeRef.current, firstNameRef.current, lastNameRef.current, roleRef.current], { opacity: 0, y: 6 });
+      gsap.set(firstNameRef.current, { x: -6, y: 0 });
+      gsap.set(lastNameRef.current, { x: -6, y: 0 });
+      gsap.set(heroImageWrapRef.current, { opacity: 0, scale: 1.03, y: 8 });
+      gsap.set(metadataRefs.current, { opacity: 0, y: 8 });
+
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-      tl.fromTo(heroTextRef.current,
-        { x: -30, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.45 }
-        , 0.2)
-        .fromTo(heroImageWrapRef.current,
-          { x: 30, opacity: 0, scale: 0.95 },
-          { x: 0, opacity: 1, scale: 1, duration: 0.55 }
-          , 0.4);
-
+      tl.to(badgeRef.current, { opacity: 1, y: 0, duration: 0.2 }, 0.15)
+        .to(firstNameRef.current, { opacity: 1, x: 0, duration: 0.26 }, 0.3)
+        .to(lastNameRef.current, { opacity: 1, x: 0, duration: 0.26 }, 0.42)
+        .to(roleRef.current, { opacity: 1, y: 0, duration: 0.2 }, 0.5)
+        .to(heroImageWrapRef.current, { opacity: 1, scale: 1, y: 0, duration: 0.42 }, 0.7)
+        .to(metadataRefs.current, { opacity: 1, y: 0, duration: 0.2, stagger: 0.08 }, 0.9);
     }, rootRef);
 
     return () => ctx.revert();
   }, [state]);
+
+  useEffect(() => {
+    if (state === 'BOOT') return;
+    const logs = [
+      'Verifying system contracts...',
+      'Health check: PASS',
+      'Latency: 42ms',
+      'Scaling policy: ACTIVE',
+    ];
+    let index = 0;
+    const interval = window.setInterval(() => {
+      pushLog(logs[index % logs.length], 'SYSTEM');
+      index += 1;
+    }, 4600);
+    return () => window.clearInterval(interval);
+  }, [state, pushLog]);
+
+  const handleHeroMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroImageRef.current) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * -4;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * -4;
+    if (hoverRaf.current) cancelAnimationFrame(hoverRaf.current);
+    hoverRaf.current = requestAnimationFrame(() => {
+      heroImageRef.current?.style.setProperty('transform', `translate(${x}px, ${y}px)`);
+    });
+  };
+
+  const handleHeroMouseLeave = () => {
+    if (!heroImageRef.current) return;
+    if (hoverRaf.current) cancelAnimationFrame(hoverRaf.current);
+    heroImageRef.current.style.setProperty('transform', 'translate(0px, 0px)');
+  };
 
   return (
     <div ref={rootRef} className="relative w-full min-h-screen flex flex-col overflow-x-hidden bg-[#050505] selection:bg-primary/20">
 
       {/* BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 grid-drift" />
       </div>
 
       <div className="relative z-10 w-full pt-4 pb-6 flex flex-col gap-5">
@@ -62,14 +111,26 @@ export default function SystemOverview() {
           {/* LEFT (7 cols) */}
           <div ref={heroTextRef} className="col-span-12 lg:col-span-7 flex flex-col gap-3 pt-1 min-w-0">
             <div className="flex flex-col gap-2">
+              <div ref={badgeRef} className="w-fit px-2 py-1 border border-white/10 bg-white/5 text-[9px] uppercase tracking-[0.3em] font-mono text-muted">
+                SYSTEM_ACTIVE
+              </div>
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[0.95] text-foreground">
-                Mayank <br />
-                <span className="text-muted/30">Sharma</span>
+                <span ref={firstNameRef} className="inline-block">
+                  Mayank
+                </span>
+                <br />
+                <span ref={lastNameRef} className="inline-block text-foreground/80">
+                  Sharma
+                </span>
               </h1>
 
-              <div className="min-w-0">
+              <div ref={roleRef} className="min-w-0">
                 <div className="text-lg md:text-xl font-semibold tracking-tight text-foreground/90">
-                  Backend Engineer
+                  {booted ? (
+                    <TypewriterText text="Backend Engineer" speed={32} delay={500} cursor />
+                  ) : (
+                    'Backend Engineer'
+                  )}
                 </div>
                 <p className="mt-2 text-sm md:text-base text-muted font-mono max-w-xl leading-relaxed">
                   Designing resilient APIs and scalable system architectures.
@@ -95,8 +156,12 @@ export default function SystemOverview() {
                   { k: 'ROLE', v: 'BACKEND_ENGINEER' },
                   { k: 'FOCUS', v: 'SYSTEM_ARCHITECTURE' },
                   { k: 'MODE', v: 'BUILDING' },
-                ].map((item) => (
-                  <div key={item.k} className="px-4 py-3">
+                ].map((item, index) => (
+                  <div
+                    key={item.k}
+                    ref={setMetadataRef(index)}
+                    className="px-4 py-3"
+                  >
                     <div className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted">
                       {item.k}
                     </div>
@@ -115,18 +180,23 @@ export default function SystemOverview() {
               ref={heroImageWrapRef}
               className="w-full max-w-[420px] rotate-1 hover:rotate-0 transition-transform duration-300 ease-out"
             >
-              <div className="relative h-[420px] lg:h-[480px] border border-white/10 bg-white/[0.02] backdrop-blur-sm p-2 shadow-2xl overflow-hidden">
+              <div
+                onMouseMove={handleHeroMouseMove}
+                onMouseLeave={handleHeroMouseLeave}
+                className="relative h-[420px] lg:h-[480px] border border-white/10 bg-white/[0.02] backdrop-blur-sm p-2 shadow-2xl overflow-hidden hero-blade group"
+              >
                 <div className="absolute top-0 left-0 w-4 h-4 border-l border-t border-primary" />
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-primary" />
 
-                <div className="relative h-full w-full overflow-hidden bg-[#0a0a0a]">
+                <div ref={heroImageRef} className="relative h-full w-full overflow-hidden bg-[#0a0a0a] transition-transform duration-300 ease-out">
                   <img
                     src={imageSrc}
                     alt="Ichigo Kurosaki"
-                    className="w-full h-full object-contain opacity-90 grayscale hover:grayscale-0 transition-all duration-300"
+                    className="w-full h-full object-contain opacity-90 grayscale transition-all duration-300"
                   />
                   <div className="absolute inset-0 pointer-events-none bg-black/35" />
-                  <div className="scanline-sweep" />
+                  <div className="image-grain" />
+                  <div className="scanline-sweep scanline-sweep--hero" />
                   <div className="panel-shimmer" />
                 </div>
               </div>
@@ -155,7 +225,7 @@ export default function SystemOverview() {
           </div>
 
           <div className="col-span-12 lg:col-start-8 lg:col-span-5 min-w-0">
-            <div className="ml-auto w-full max-w-[420px]">
+            <div className="ml-auto w-full max-w-[420px] lg:sticky lg:top-24">
               <HeroTerminal />
             </div>
           </div>

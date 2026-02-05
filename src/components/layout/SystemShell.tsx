@@ -19,17 +19,26 @@ import Link from 'next/link';
 import Lenis from 'lenis';
 
 export default function SystemShell({ children }: { children: React.ReactNode }) {
-    const { state, activeModule, mountModule, bootSystem } = useSystem();
+    const { state, activeModule, mountModule, bootSystem, pushLog } = useSystem();
     const pathname = usePathname();
     const isHomeView = pathname === '/' && !activeModule;
     const scrollWrapperRef = useRef<HTMLDivElement>(null);
     const scrollContentRef = useRef<HTMLDivElement>(null);
+    const navHoverRef = useRef<Record<string, number>>({});
 
     const handleSystemReset = () => {
         synth.playClick();
         if (activeModule) {
             mountModule('RESET'); // Internal signal to clear
         }
+    };
+
+    const handleNavHover = (label: string) => {
+        if (!isHomeView) return;
+        const now = Date.now();
+        if ((navHoverRef.current[label] || 0) + 1500 > now) return;
+        navHoverRef.current[label] = now;
+        pushLog(`Navigating to ${label} index...`, 'SYSTEM');
     };
 
     // Trigger boot on mount
@@ -203,15 +212,19 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                                     <Link
                                         key={item.path}
                                         href={item.path}
-                                        onMouseEnter={() => synth.playHover()}
+                                        onMouseEnter={() => {
+                                            synth.playHover();
+                                            handleNavHover(item.label);
+                                        }}
                                         onClick={() => synth.playClick()}
-                                        className={`relative h-14 px-6 flex items-center justify-center text-[10px] tracking-[0.2em] font-mono uppercase transition-all duration-300
+                                        className={`relative h-14 px-6 flex items-center justify-center text-[10px] tracking-[0.2em] font-mono uppercase transition-all duration-300 nav-underline
                                             ${isActive
                                                 ? 'text-primary bg-primary/5 border-b-2 border-primary'
                                                 : 'text-muted hover:text-foreground hover:bg-white/5 border-b-2 border-transparent'
                                             }`}
                                     >
                                         {item.label}
+                                        <span className="nav-underline__line" />
                                     </Link>
                                 );
                             })}
@@ -221,7 +234,7 @@ export default function SystemShell({ children }: { children: React.ReactNode })
                     {/* Right Side Status */}
                     <div className="ml-auto flex items-center gap-4">
                         <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 heartbeat-dot" />
                             <span className="text-[9px] font-mono text-muted tracking-wider">ONLINE</span>
                         </div>
                     </div>
