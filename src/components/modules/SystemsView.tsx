@@ -96,10 +96,20 @@ export default function SystemsView() {
         </div>
       </section>
 
-      <section className="relative border border-border bg-background px-5 py-5">
-        <div className="absolute -inset-2 border border-border/30 pointer-events-none" />
+      <section className="relative border border-border bg-background px-5 py-5 overflow-hidden">
+        <div className="absolute -inset-2 border border-border/30 pointer-events-none z-20" />
 
-        <div className="relative grid grid-cols-2 gap-6 h-[66vh]">
+        {/* Background Image - Johann */}
+        <div className="absolute -right-10 top-0 w-[400px] h-[600px] pointer-events-none opacity-[0.06] mix-blend-luminosity z-0">
+          <img
+            src="/Johann.jpg"
+            alt="System Architecture"
+            className="w-full h-full object-cover grayscale contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-transparent" />
+        </div>
+
+        <div className="relative z-10 grid grid-cols-2 gap-6 h-[66vh]">
           <SystemsPanel title="CORE SYSTEMS" clusters={coreSystems} />
           <SystemsPanel title="BACKEND STACK" clusters={backendStack} />
           <SystemsPanel title="FRONTEND EXPANSION" clusters={frontendExpansion} />

@@ -123,7 +123,18 @@ export default function WorkView() {
           </aside>
 
           {/* Right: Details */}
-          <div className="pl-6 overflow-y-auto">
+          <div className="relative pl-6 overflow-y-auto h-full">
+            {/* Background Watermark - Edward Elric */}
+            <div className="absolute top-0 right-0 w-[400px] h-[500px] pointer-events-none overflow-hidden opacity-[0.07] mix-blend-luminosity z-0">
+              <img
+                src="/FMAB.jpg"
+                alt="Engineering Protocol"
+                className="w-full h-full object-cover grayscale contrast-125"
+              />
+              <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+            </div>
+
             <AnimatePresence mode="wait">
               {selected && (
                 <motion.div
@@ -132,7 +143,7 @@ export default function WorkView() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease: 'easeInOut' }}
-                  className="relative"
+                  className="relative z-10"
                 >
                   <div className="flex items-start justify-between gap-6">
                     <div>
